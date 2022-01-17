@@ -1,9 +1,13 @@
 const express = require('express');
 const helmet = require('helmet');
 const rateLimite = require('express-rate-limit');
+const userRoutes = require('./routes/user.route');
+const postRoutes = require('./routes/post.route');
 require('dotenv').config({ path: './config/.env',encoding: "latin1" });
 const bodyParser = require("body-parser");
 require('./config/db');
+
+const {User} = require("./models");
 
 const app = express();
 
@@ -30,10 +34,13 @@ app.use(bodyParser.json());
 
 app.use(rateLimite({
     windowMs: 24 * 60 * 60 * 1000,
-    max: 1000,
+    max: 10000,
     message: "Vous avez effectué plus de 100 requétes dans une limite de 24 heures!",
     headers: true,
 }));
 
+// Router
+app.use('/api/user', userRoutes);
+app.use('/api/post', postRoutes);
 
 module.exports = app;

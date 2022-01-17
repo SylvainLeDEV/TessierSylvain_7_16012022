@@ -47,10 +47,10 @@ const server = http.createServer(app);
 server.on('error', errorHandler);
 server.on('listening', async () => {
     const address = server.address();
-    const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
-    console.log('Listening on ' + bind);
+    const bind = typeof address === 'string' ? 'pipe ' + address : + port;
+    console.log('Listening on http://localhost:' + bind+"/");
 
-    await sequelize.sync({alter: true}).then(() => console.log('Connection DB OK')).catch((err) => console.log("Failed to connect to DB", err));
+    await sequelize.sync({alter: true, force: false}).then(() => console.log('Connection DB OK')).catch((err) => console.log("Failed to connect to DB", err));
 });
 
 server.listen(port);
