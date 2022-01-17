@@ -2,7 +2,8 @@
 const {
   Model
 } = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+const {v4: uuidv4} = require("uuid");
+module.exports = (sequelize, DataType) => {
   class Comments extends Model {
     /**
      * Helper method for defining associations.
@@ -11,14 +12,27 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
     }
   }
   Comments.init({
-    uuid: DataTypes.STRING,
-    posterId: DataTypes.STRING,
-    content: DataTypes.STRING,
-    imageUrl: DataTypes.STRING,
-    videoUrl: DataTypes.STRING
+    uuid: {
+      type:DataType.UUID,
+      allowNull: false,
+      defaultValue:uuidv4
+    },
+    posterId: {
+      type: DataType.STRING
+    },
+    content: {
+      type: DataType.STRING
+    },
+    imageUrl: {
+      type: DataType.STRING
+    },
+    videoUrl: {
+      type: DataType.STRING
+    }
   }, {
     sequelize,
     modelName: 'Comments',

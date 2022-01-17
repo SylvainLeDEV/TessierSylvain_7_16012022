@@ -1,4 +1,6 @@
 'use strict';
+const { v4: uuidv4 } = require('uuid');
+
 const {
   Model
 } = require('sequelize');
@@ -11,14 +13,31 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
     }
   }
   Posts.init({
-    uuid: DataTypes.STRING,
-    posterId: DataTypes.STRING,
-    content: DataTypes.STRING,
-    imageUrl: DataTypes.STRING,
-    videoUrl: DataTypes.STRING
+    uuid: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      defaultValue:uuidv4
+    },
+    posterId: {
+      allowNull: false,
+      type: DataTypes.STRING
+    },
+    content: {
+      allowNull: false,
+      type: DataTypes.STRING
+    },
+    imageUrl: {
+      allowNull: true,
+      type: DataTypes.STRING
+    },
+    videoUrl: {
+      allowNull: true,
+      type: DataTypes.STRING
+    },
   }, {
     sequelize,
     modelName: 'Posts',
