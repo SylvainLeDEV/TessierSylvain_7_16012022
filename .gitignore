@@ -1,0 +1,9 @@
+.DS_Store
+.idea
+/.idea
+/frontend/node_modules
+/backend/node_modules
+/backend/images/*
+/backend/config/.env
+/backend/migrations/*
+
