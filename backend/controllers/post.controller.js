@@ -6,23 +6,19 @@ const {User} = require('../models/');
 // const pipeline = promisify(require('stream').pipeline);
 //
 // const ObjectID = require('mongoose').Types.ObjectId;
-//
-// // router.get('/', postControllers.readPost);
-// // router.post('/', postControllers.createPost);
-// // router.put('/:id', postControllers.updatePost);
-// // router.delete('/:id', postControllers.deletePost);
-// // router.patch('/like-post/:id, postControllers.likePost')
-// // router.patch('/unlike-post/:id, postControllers.unlikePost')
-//
-//
+
 module.exports.readPost = (req, res, next) => {
     Posts.findAll({include: [User]})
         .then((posts) => {
-            const post = posts.sort(function (a, b) { return b.createdAt - a.createdAt })
+            const post = posts.sort(function (a, b) {
+                return b.createdAt - a.createdAt
+            })
             console.log("ICI : ", posts)
             return res.status(200).json(post)
         })
-        .catch((error) => { return res.status(500).json({error: error})})
+        .catch((error) => {
+            return res.status(500).json({error: error})
+        })
 }
 
 module.exports.createPost = async (req, res, next) => {
@@ -47,43 +43,48 @@ module.exports.createPost = async (req, res, next) => {
                     }
                 );
         })
-
 }
-//
-// module.exports.updatePost = (req, res, next) => {
-//     if (!ObjectID.isValid(req.params.id))
-//         return res.status(400).send('ID unknow : ' + req.params.id);
-//
-//     const updatedRecord = {
-//         message: req.body.message
-//     }
-//
-//     postModel.findByIdAndUpdate(
-//         req.params.id,
-//         {$set: updatedRecord},
-//         {new: true},
-//         (err, docs) => {
-//             if (!err) res.status(200).send(docs);
-//             else console.log("Update error : " + err);
-//         }
-//     )
-// }
-//
-// module.exports.deletePost = (req, res, next) => {
-//     if (!ObjectID.isValid(req.params.id))
-//         return res.status(400).send('ID unknow : ' + req.params.id);
-//
-//     postModel.findByIdAndRemove(
-//         req.params.id,
-//         (err, docs) => {
-//             if (!err) res.status(200).send(docs);
-//             else console.log("Delete error : " + err);
-//         }
-//     )
-//
-//
-// }
-//
+
+module.exports.updatePost = (req, res, next) => {
+    // ATTENTION AJOUTER L'AUTH !!!
+    const uuidPost = req.params.uuid
+    const {content, imageUrl, videoUrl} = req.body
+
+    Posts.findOne({where: {uuid: uuidPost}})
+        .then((post) => {
+            post.content = content
+            post.imageUrl = imageUrl
+            post.videoUrl = videoUrl
+            post.save().then(() => {
+                return res.status(200).json({message: 'Post upDate'})
+            })
+                .catch((err) => {
+                    return res.status(400).json({err, message: "Une erreur dans les donées"})
+                })
+
+        })
+        .catch((err) => {
+            return res.status(500).json({err: err})
+        })
+}
+
+module.exports.deletePost = (req, res, next) => {
+    // ATTENTION AJOUTER L'AUTH !!!
+    const uuidPost = req.params.uuid
+    console.log(uuidPost)
+    Posts.findOne({
+        where: {uuid: uuidPost},
+    })
+        .then((post) => {
+            console.log(post)
+            post.destroy()
+            return res.status(200).json({message: 'Post destroy'})
+        })
+        .catch((err) => {
+            return res.status(500).json({err: err})
+        })
+}
+
 // module.exports.likePost = (req, res, next) => {
 //     if (!ObjectID.isValid(req.params.id))
 //         return res.status(400).send('ID unknow : ' + req.params.id);
