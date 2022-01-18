@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.User, {
+        foreignKey:"userId"
+      })
 
     }
   }
@@ -22,13 +25,13 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue:uuidv4
     },
-    posterId: {
-      allowNull: false,
-      type: DataTypes.STRING
-    },
     content: {
       allowNull: false,
       type: DataTypes.STRING
+    },
+    userId:{
+      type:DataTypes.INTEGER,
+      allowNull: false
     },
     imageUrl: {
       allowNull: true,

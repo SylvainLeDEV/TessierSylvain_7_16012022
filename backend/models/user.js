@@ -1,6 +1,7 @@
 'use strict';
 
 const { v4: uuidv4 } = require('uuid');
+const validator = require('validator');
 
 const {
   Model
@@ -14,27 +15,45 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.hasMany(models.Posts)
+      this.hasMany(models.Posts, {
+        foreignKey:"userId",
+        as : 'posts'
+      })
+    }
+    toJSON() {
+      return {...this.get(), id: undefined, userId: undefined};
     }
   }
   User.init({
     uuid: {
       type:DataTypes.UUID,
       allowNull: false,
-      defaultValue:uuidv4
+      defaultValue:uuidv4,
+      isUUID: 4,
     },
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate:{
+        notNull: { msg : 'firstName must have a name'},
+        notEmpty: { msg : 'firstName must not be empty'}
+      }
     },
     lastName: {
       allowNull: false,
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      max: 23,
+      min: 3,
     },
     email: {
       allowNull: false,
       type: DataTypes.STRING,
-      unique:true,
+      unique:"email",
+      validate: {
+        notNull: { msg : 'email must have a name'},
+        notEmpty: { msg : 'email must not be empty'},
+        isEmail: true
+      },
     },
     password: {
       allowNull: false,
@@ -50,7 +69,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     poste: {
       allowNull: false,
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      validate:{
+        notNull: { msg : 'poste must have a name'},
+        notEmpty: { msg : 'poste must not be empty'}
+      }
     },
     isAdmin:{
       type:DataTypes.BOOLEAN

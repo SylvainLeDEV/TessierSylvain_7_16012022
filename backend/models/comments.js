@@ -12,7 +12,6 @@ module.exports = (sequelize, DataType) => {
      */
     static associate(models) {
       // define association here
-
     }
   }
   Comments.init({
@@ -32,7 +31,11 @@ module.exports = (sequelize, DataType) => {
     },
     videoUrl: {
       type: DataType.STRING
-    }
+    },
+    userId:{
+      type:DataType.INTEGER,
+      allowNull: false
+    },
   }, {
     sequelize,
     modelName: 'Comments',

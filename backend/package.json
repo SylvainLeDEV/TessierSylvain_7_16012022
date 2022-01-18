@@ -22,7 +22,8 @@
     "nodemon": "^2.0.15",
     "sequelize": "^6.13.0",
     "uuid": "^8.3.2",
-    "uuid-v4": "^0.1.0"
+    "uuid-v4": "^0.1.0",
+    "validator-js": "^0.2.1"
   },
   "devDependencies": {
     "sequelize-cli": "^6.4.1"

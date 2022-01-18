@@ -1,5 +1,5 @@
-// const postModel = require('../models/post.models');
-// const userModel = require('../models/user.models');
+const {Posts} = require('../models/');
+const {User} = require('../models/');
 // const {uploadErrors} = require("../utils/errors.utils");
 // const fs = require("fs");
 // const {promisify} = require("util");
@@ -15,56 +15,40 @@
 // // router.patch('/unlike-post/:id, postControllers.unlikePost')
 //
 //
-// module.exports.readPost = (req, res, next) => {
-//     postModel.find((err, docs) => {
-//         if (!err) res.status(200).send(docs)
-//         else console.log('Error to get date : ' + err)
-//     }).sort({createdAt: -1}); // Passe les post du plus récent au plus ancien
-// }
-//
-// module.exports.createPost = async (req, res, next) => {
-//     let fileName;
-//
-//
-//     if (req.file !== null) {
-//         try {
-//             // console.log(req.file)
-//             // console.log(req.file.mimetype !== 'image/png')
-//             if (req.file.mimetype !== 'image/png' && req.file.mimetype !== 'image/jpg' && req.file.mimetype !== 'image/jpeg')
-//                 throw Error("invalid file");
-//
-//             if (req.file.size > 500000) throw Error("max size");
-//         } catch (err) {
-//             const errors = uploadErrors(err);
-//             return res.status(201).json({errors});
-//         }
-//     }
-//     fileName = req.body.posterId + Date.now() + ".jpg";
-//     await pipeline(
-//         req.file.fieldname,
-//         fs.createWriteStream(
-//             `${__dirname}/../client/public/uploads/posts/${fileName}`
-//         )
-//     );
-//
-//
-//     const newPost = new postModel({
-//         posterId: req.body.posterId,
-//         message: req.body.message,
-//         picture: req.file !== null ? "./uploads/posts/" + fileName : "",
-//         video: req.body.video,
-//         likers: [],
-//         comments: [],
-//     });
-//     console.log(fileName)
-//     try {
-//         const post = await newPost.save();
-//         return res.status(201).json(post);
-//     } catch (err) {
-//         return res.status(400).send({err});
-//     }
-//
-// }
+module.exports.readPost = (req, res, next) => {
+    Posts.findAll({include: [User]})
+        .then((posts) => {
+            const post = posts.sort(function (a, b) { return b.createdAt - a.createdAt })
+            console.log("ICI : ", posts)
+            return res.status(200).json(post)
+        })
+        .catch((error) => { return res.status(500).json({error: error})})
+}
+
+module.exports.createPost = async (req, res, next) => {
+    const {content, imageUrl, videoUrl, userUuid} = req.body
+    User.findOne({where: {uuid: userUuid}})
+        .then((user) => {
+            console.log(user)
+            if (!user)
+                return res.status(401).json({message: "Utilisateur non trouvé !"})
+
+            Posts.create({content, imageUrl, videoUrl, userId: user.id})
+                .then(() => {
+                        res.status(201).json({
+                            message: 'Post saved successfully!'
+                        });
+                    }
+                )
+                .catch((error) => {
+                        res.status(400).json({
+                            error: error
+                        });
+                    }
+                );
+        })
+
+}
 //
 // module.exports.updatePost = (req, res, next) => {
 //     if (!ObjectID.isValid(req.params.id))
@@ -83,7 +67,6 @@
 //             else console.log("Update error : " + err);
 //         }
 //     )
-//
 // }
 //
 // module.exports.deletePost = (req, res, next) => {
