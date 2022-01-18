@@ -6,8 +6,8 @@ const upload = multer();
 
 
 // Routes for post and like
-// router.get('/', postControllers.readPost);
-// router.post('/', upload.single('file'),postControllers.createPost);
+router.get('/', postControllers.readPost);
+router.post('/',postControllers.createPost);
 // router.put('/:id', postControllers.updatePost);
 // router.delete('/:id', postControllers.deletePost);
 

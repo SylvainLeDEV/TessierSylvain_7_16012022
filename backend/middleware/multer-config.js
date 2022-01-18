@@ -1,31 +1,33 @@
 const multer = require('multer');
-const path = require("path");
-const fs = require("fs");
 
 const MIME_TYPES = {
     'image/jpg': 'jpg',
-    'image/jpeg': 'jpg',
+    'image/jpeg': 'jpeg',
     'image/png': 'png',
-    'image/gif' : 'gif'
+    'image/gif': 'gif'
 };
 
+const limits = {
+    fileSize : 5 * 1024 * 1024,
+    //5 242 880byte/Octets = 5Mo
+};
+
+const types = Object.keys(MIME_TYPES)
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-       const targetPath = path.join(__dirname, "../client/public/uploads/profil/");
-        callback(null, targetPath);
+        if (types.includes(file.mimetype)) {
+            callback(null, 'images');
+        } else {
+            callback(new Error("Only jpg, jpeg, png, gif"), true)
+        }
     },
     filename: (req, file, callback) => {
-        // const name = file.originalname.split(' ').join('_');
-        // const extension = MIME_TYPES[file.mimetype];
-        // const nameEdit = name.split("." + extension).join("")
-        const name = req.body.name + ".jpg"
-        callback(null, name);
-
-        // callback(null, nameEdit + Date.now() + '.' + extension);
-    }
+        const name = file.originalname.split(' ').join('_');
+        const extension = MIME_TYPES[file.mimetype];
+        const nameEdit = name.split("." + extension).join("")
+        callback(null, nameEdit + Date.now() + '.' + extension);
+    },
 });
 
-
-
-module.exports = multer({storage: storage}).single('file');
+module.exports = multer({limits ,storage}).single('image');

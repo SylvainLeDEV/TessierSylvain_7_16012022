@@ -18,10 +18,8 @@ const {UUIDV4} = require("sequelize");
 // }
 
 module.exports.signUp = (req, res) => {
-    console.log(req.body.password)
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
-            console.log(hash)
             User.create({
                 email: req.body.email,
                 firstName: req.body.firstName,

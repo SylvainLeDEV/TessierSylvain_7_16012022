@@ -14,9 +14,9 @@ router.post("/login/", authController.login);
 
 //User DB
 router.get("/", userController.getAllUsers);
-// router.get("/:id", userController.userInfo);
-// router.put("/:id", userController.updateUser);
-// router.delete("/:id", userController.deleteUser);
+router.get("/:uuid", userController.userInfo);
+router.put("/:uuid", userController.updateUser);
+router.delete("/:uuid", userController.deleteUser);
 
 //Upload
 // router.post("/upload", multer, uploadController.uploadProfil);
