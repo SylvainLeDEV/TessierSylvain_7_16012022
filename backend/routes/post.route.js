@@ -8,8 +8,8 @@ const upload = multer();
 // Routes for post and like
 router.get('/', postControllers.readPost);
 router.post('/',postControllers.createPost);
-// router.put('/:id', postControllers.updatePost);
-// router.delete('/:id', postControllers.deletePost);
+router.put('/:uuid', postControllers.updatePost);
+router.delete('/:uuid', postControllers.deletePost);
 
 
 // Routes for comments

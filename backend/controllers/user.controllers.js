@@ -40,10 +40,10 @@ module.exports.userInfo = (req, res, next) => {
 
 module.exports.deleteUser = (req, res, next) => {
 // ATTENTION AJOUTER L'AUTH !!!
-    const uuid = req.params.uuid
+    const uuidUser = req.params.uuid
     console.log(uuid)
     User.findOne({
-        where: {uuid: uuid},
+        where: {uuid: uuidUser},
     })
         .then((user) => {
             user.destroy()
@@ -56,10 +56,10 @@ module.exports.deleteUser = (req, res, next) => {
 
 module.exports.updateUser = async (req, res, next) => {
     // ATTENTION AJOUTER L'AUTH !!!
-    const uuid = req.params.uuid
+    const uuidUser = req.params.uuid
     const {firstName, lastName, email, poste, bio, picture} = req.body
 
-    User.findOne({where: {uuid: uuid}})
+    User.findOne({where: {uuid: uuidUser}})
         .then((user) => {
             user.firstName = firstName
             user.lastName = lastName
