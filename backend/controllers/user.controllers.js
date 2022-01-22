@@ -11,14 +11,6 @@ module.exports.getAllUsers = ((req, res) => {
 });
 
 module.exports.userInfo = (req, res, next) => {
-    // console.log(req.params);
-    // if (!ObjectID.isValid(req.params.id))
-    //     return res.status(400).send('ID unknow : ' + req.params.id)
-    //
-    // userModel.findById(req.params.id, (err, docs) => {
-    //     if (!err) res.send(docs);
-    //     else console.log('ID unknown : ' + err);
-    // }).select('-password')
 
     const uuid = req.params.uuid
     console.log(uuid)
@@ -41,12 +33,18 @@ module.exports.userInfo = (req, res, next) => {
 module.exports.deleteUser = (req, res, next) => {
 // ATTENTION AJOUTER L'AUTH !!!
     const uuidUser = req.params.uuid
-    console.log(uuid)
     User.findOne({
         where: {uuid: uuidUser},
     })
         .then((user) => {
-            user.destroy()
+            console.log(user)
+
+            if (user.uuid !== req.auth.userId) {
+                return res.status(400).json({
+                    message: 'Unauthorized request',
+                })
+            }
+            // user.destroy()
             return res.status(200).json({message: 'User destroy'})
         })
         .catch((err) => {

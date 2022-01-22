@@ -12,6 +12,10 @@ module.exports = (sequelize, DataType) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.Posts, {
+        foreignKey:"postId"
+      });
+
     }
   }
   Comments.init({
@@ -32,7 +36,7 @@ module.exports = (sequelize, DataType) => {
     videoUrl: {
       type: DataType.STRING
     },
-    userId:{
+    postId:{
       type:DataType.INTEGER,
       allowNull: false
     },

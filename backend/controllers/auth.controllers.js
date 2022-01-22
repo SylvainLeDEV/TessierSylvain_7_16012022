@@ -3,19 +3,11 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config({path: './config/.env', encoding: "latin1"});
 
 const {User} = require("../models");
-const {UUIDV4} = require("sequelize");
 
 // const errorsUtils = require('../utils/errors.utils');
 //JWT sont des jetons générés par un serveur lors de l’authentification
 // d’un utilisateur sur une application Web, et qui sont ensuite transmis au client.
-// const jwt = require("jsonwebtoken");
-//
-// const maxAge = 3 * 24 * 60 * 60 * 1000
-// const createToken = (id) => {
-//     return jwt.sign({id}, process.env.TOKEN_SECRET, {
-//         expiresIn: maxAge
-//     })
-// }
+
 
 module.exports.signUp = (req, res) => {
     bcrypt.hash(req.body.password, 10)
@@ -39,34 +31,37 @@ module.exports.signUp = (req, res) => {
 };
 
 exports.login = (req, res, next) => {
-    User.findOne( { where: {email : req.body.email}})
+    User.findOne({where: {email: req.body.email}})
         .then(user => {
             console.log(user)
-            if (!user){
-                return res.status(401).json({ message: 'Utilisateur non trouvé ! ' })
+            if (!user) {
+                return res.status(401).json({message: 'Utilisateur non trouvé ! '})
             }
 
-            bcrypt.compare(req.body.password, user.password )
+            bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
                     console.log(valid)
                     console.log(user.uuid)
-                    if (!valid){
-                        return res.status(401).json({ message: 'Mot de passe incorrect! ' })
+                    if (!valid) {
+                        return res.status(401).json({message: 'Mot de passe incorrect! '})
                     }
                     return res.status(200).send({
-                        userId: user.uuid,
+                        uuidUser: user.uuid,
                         // La méthode  sign()  du package  jsonwebtoken  utilise une clé secrète pour encoder un token qui peut contenir un payload personnalisé et avoir une validité limitée.
                         token: jwt.sign(
-                            { userId : user.uuid },
+                            {
+                                uuidUser: user.uuid,
+                                isAdmin: user.isAdmin
+                            },
                             process.env.TOKEN_KEY,
-                            { expiresIn : '24h' }
+                            {expiresIn: '24h'}
                         )
                     })
                 })
-                .catch(error => res.status(500).json({ error : error }))
+                .catch(error => res.status(500).json({error: error}))
 
         })
-        .catch(error => res.status(500).json({ error : error }))
+        .catch(error => res.status(500).json({error: error}))
 
 };
 

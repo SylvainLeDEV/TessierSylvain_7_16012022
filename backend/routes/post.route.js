@@ -2,6 +2,8 @@ const router = require('express').Router();
 const postControllers = require('../controllers/post.controller');
 const multer = require("multer");
 const upload = multer();
+const auth = require('../middleware/auth.middleware');
+
 
 
 
@@ -13,9 +15,10 @@ router.delete('/:uuid', postControllers.deletePost);
 
 
 // Routes for comments
-// router.patch('/comment-post/:id', postControllers.commentPost);
-// router.patch('/edit-comment-post/:id', postControllers.editCommentPost);
-// router.patch('/delete-comment-post/:id', postControllers.deleteCommentPost);
+router.get('/comment-post/:uuid', postControllers.getCommentPost);
+router.patch('/create-comment-post/', postControllers.createCommentPost);
+router.put('/edit-comment-post/:uuid', postControllers.editCommentPost);
+router.delete('/delete-comment-post/:uuid', postControllers.deleteCommentPost);
 
 
 module.exports = router;
