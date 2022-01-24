@@ -2,7 +2,7 @@ const {Posts} = require('../models/');
 const {User} = require('../models/');
 const {Comments} = require('../models/')
 // const {uploadErrors} = require("../utils/errors.utils");
-// const fs = require("fs");
+const fs = require("fs");
 // const {promisify} = require("util");
 // const pipeline = promisify(require('stream').pipeline);
 //
@@ -14,7 +14,6 @@ module.exports.readPost = (req, res, next) => {
             const post = posts.sort(function (a, b) {
                 return b.createdAt - a.createdAt
             })
-            console.log("ICI : ", posts)
             return res.status(200).json(post)
         })
         .catch((error) => {
@@ -23,13 +22,13 @@ module.exports.readPost = (req, res, next) => {
 }
 
 module.exports.createPost = async (req, res, next) => {
-    const {content, imageUrl, videoUrl, userUuid} = req.body
+    const {content, videoUrl, userUuid} = req.body
+    const imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     User.findOne({where: {uuid: userUuid}})
         .then((user) => {
             console.log(user)
             if (!user)
                 return res.status(401).json({message: "Utilisateur non trouvé !"})
-
             Posts.create({content, imageUrl, videoUrl, userId: user.id})
                 .then(() => {
                         res.status(201).json({
@@ -46,23 +45,74 @@ module.exports.createPost = async (req, res, next) => {
         })
 }
 
-module.exports.updatePost = (req, res, next) => {
+module.exports.readOnePost = (req, res, next) => {
     // ATTENTION AJOUTER L'AUTH !!!
     // METTRE EN PLACE le isAdmin
     const uuidPost = req.params.uuid
-    const {content, imageUrl, videoUrl} = req.body
 
+    Posts.findOne({where: {uuid: uuidPost}, include: [User, Comments]})
+        .then((post) => {
+
+            if (!post) {
+                return res.status(400).json({message: "Pas de post !"})
+            }
+
+            return res.status(200).json(post)
+        })
+        .catch((err) => {
+            return res.status(500).json({err: err})
+        })
+}
+
+module.exports.updatePost = (req, res, next) => {
+    // METTRE EN PLACE le isAdmin
+    const uuidPost = req.params.uuid
+    const {content, videoUrl} = req.body
+    console.log(req.body)
     Posts.findOne({where: {uuid: uuidPost}})
         .then((post) => {
-            post.content = content
-            post.imageUrl = imageUrl
-            post.videoUrl = videoUrl
-            post.save().then(() => {
-                return res.status(200).json({message: 'Post upDate'})
-            })
-                .catch((err) => {
-                    return res.status(400).json({err, message: "Une erreur dans les donées"})
+            const filename = post.imageUrl.split('/images/posts')[1];
+            if (!post) {
+                return res.status(401).json({message: "Pas de post trovué ! "})
+            }
+
+            // if (post.User.uuid !== req.auth.uuidUserToken) {
+            //     return res.status(400).json({
+            //         message: 'Unauthorized request',
+            //     })
+            // }
+
+            if (req.file) {
+                fs.unlink(`images/posts/${filename}`, () => {
+                    const postObject = {
+                        content,
+                        videoUrl,
+                        imageUrl:`${req.protocol}://${req.get('host')}/images/posts/${req.file.filename}`
+                    }
+                    post.update(postObject, {
+                        where : req.params.uuid
+                    }).then(() => {
+                        return res.status(200).json({message: 'Post upDate'})
+                    })
+                        .catch((err) => {
+                            return res.status(400).json({err, message: "Une erreur dans les donées"})
+                        })
                 })
+            } else {
+                const postObject = {
+                    content,
+                    videoUrl,
+                }
+                post.update(postObject, {
+                    where : req.params.uuid
+                }).then(() => {
+                    return res.status(200).json({message: 'Post upDate'})
+                })
+                    .catch((err) => {
+                        return res.status(400).json({err, message: "Une erreur dans les donées"})
+                    })
+            }
+
 
         })
         .catch((err) => {
@@ -74,15 +124,21 @@ module.exports.deletePost = (req, res, next) => {
     // ATTENTION AJOUTER L'AUTH !!!
     // METTRE EN PLACE le isAdmin
     const uuidPost = req.params.uuid
-    console.log(uuidPost)
     Posts.findOne({
-        where: {uuid: uuidPost},
+        where: {uuid: uuidPost}, include: [User, Comments]
     })
         .then((post) => {
-            if (!post){
-                return res.status(401).json({ message : "Pas de post trovué ! " })
+            if (!post) {
+                return res.status(401).json({message: "Pas de post trovué ! "})
             }
-            console.log(post)
+            if (post.User.uuid !== req.auth.uuidUserToken) {
+                return res.status(400).json({
+                    message: 'Unauthorized request',
+                })
+            }
+            const filename = post.imageUrl.split('/images/posts')[1];
+            fs.unlink(`images/posts/${filename}`, {})
+
             post.destroy()
             return res.status(200).json({message: 'Post destroy'})
         })
@@ -154,44 +210,49 @@ module.exports.deletePost = (req, res, next) => {
 
 module.exports.createCommentPost = (req, res, next) => {
     const {content, imageUrl, videoUrl, postUuid, posterId} = req.body
-    Posts.findOne({where: {uuid: postUuid}})
-        .then((post) => {
-            console.log(post)
-            if (!post)
-                return res.status(401).json({message: "Post non trouvé !"})
-            console.log(post)
-            Comments.create({content, imageUrl, videoUrl, postId: post.id, posterId: posterId})
-                .then(() => {
-                        res.status(201).json({
-                            message: 'Comment saved successfully!'
-                        });
-                    }
-                )
-                .catch((error) => {
-                        res.status(400).json({
-                            error: error
-                        });
-                    }
-                );
-        })
+    User.findOne({where: {uuid: posterId}})
+        .then((user) => {
+            const userId = user.id
+            console.log(userId)
+            Posts.findOne({where: {uuid: postUuid}})
+                .then((post) => {
+                    console.log(post)
+                    if (!post)
+                        return res.status(401).json({message: "Post non trouvé !"})
+                    console.log(post)
 
+                    Comments.create({content, imageUrl, videoUrl, postId: post.id, posterId: posterId, userId: userId})
+                        .then(() => {
+                                res.status(201).json({
+                                    message: 'Comment saved successfully!'
+                                });
+                            }
+                        )
+                        .catch((error) => {
+                                res.status(400).json({
+                                    error: error
+                                });
+                            }
+                        );
+                })
+        })
 }
 
 module.exports.getCommentPost = (req, res, next) => {
     const uuidPost = req.params.uuid
-    Posts.findOne({where: {uuid : uuidPost}})
+    Posts.findOne({where: {uuid: uuidPost}, include: [User]})
         .then((post) => {
-            if(!post){
-                return res.status(400).json({ message : "Pas de post trouvé !"  })
+            if (!post) {
+                return res.status(400).json({message: "Pas de post trouvé !"})
             }
             console.log(post)
-            Comments.findAll({where: {  postId : post.id }})
+            Comments.findAll({where: {postId: post.id}, include: [User]})
                 .then((comment) => {
                     const comments = comment.sort(function (a, b) {
                         return b.createdAt - a.createdAt
                     })
                     console.log("ICI : ", comments)
-                    return res.status(200).json([ "post : ", post, "comment :", comments])
+                    return res.status(200).json(["post : ", post, "comment :", [comments]])
                 })
                 .catch((error) => {
                     return res.status(500).json({error: error})
@@ -205,11 +266,11 @@ module.exports.editCommentPost = (req, res, next) => {
     // METTRE EN PLACE le isAdmin
 
     const uuidComment = req.params.uuid
-    const { content,  imageUrl, videoUrl} = req.body
-    Comments.findOne({where : { uuid : uuidComment }})
-        .then((comment ) => {
-            if(!comment){
-                return res.status(401).json({ message : "Pas de comentaire trouvé !"})
+    const {content, imageUrl, videoUrl} = req.body
+    Comments.findOne({where: {uuid: uuidComment}})
+        .then((comment) => {
+            if (!comment) {
+                return res.status(401).json({message: "Pas de comentaire trouvé !"})
             }
             console.log(comment)
 
@@ -222,8 +283,6 @@ module.exports.editCommentPost = (req, res, next) => {
                 .catch((err) => {
                     return res.status(400).json({err, message: "Une erreur dans les donées"})
                 })
-
-
         })
 }
 
@@ -233,14 +292,13 @@ module.exports.deleteCommentPost = (req, res, next) => {
     // METTRE EN PLACE le isAdmin
 
     const uuidComment = req.params.uuid
-    console.log(uuidComment)
     Comments.findOne({
         where: {uuid: uuidComment},
     })
         .then((comment) => {
 
-            if (!comment){
-                return res.status(401).json({ message : "Pas de commentaire trovué ! " })
+            if (!comment) {
+                return res.status(401).json({message: "Pas de commentaire trovué ! "})
             }
 
             console.log(comment)

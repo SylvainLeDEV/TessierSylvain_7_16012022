@@ -1,17 +1,17 @@
 const router = require('express').Router();
 const postControllers = require('../controllers/post.controller');
-const multer = require("multer");
-const upload = multer();
 const auth = require('../middleware/auth.middleware');
 
+const multer = require('../middleware/multer-config');
 
 
 
 // Routes for post and like
 router.get('/', postControllers.readPost);
-router.post('/',postControllers.createPost);
-router.put('/:uuid', postControllers.updatePost);
-router.delete('/:uuid', postControllers.deletePost);
+router.get('/:uuid', postControllers.readOnePost);
+router.post('/', multer, postControllers.createPost);
+router.put('/:uuid', multer,postControllers.updatePost);
+router.delete('/:uuid', auth,postControllers.deletePost);
 
 
 // Routes for comments

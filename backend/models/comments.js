@@ -13,9 +13,13 @@ module.exports = (sequelize, DataType) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Posts, {
-        foreignKey:"postId"
+        foreignKey:"postId",
+        // onDelete: 'CASCADE'
       });
-
+      this.belongsTo(models.User,{
+        foreignKey: "userId",
+        // onDelete: 'CASCADE'
+      })
     }
   }
   Comments.init({
@@ -37,6 +41,10 @@ module.exports = (sequelize, DataType) => {
       type: DataType.STRING
     },
     postId:{
+      type:DataType.INTEGER,
+      allowNull: false
+    },
+    userId : {
       type:DataType.INTEGER,
       allowNull: false
     },

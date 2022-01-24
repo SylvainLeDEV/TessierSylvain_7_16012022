@@ -17,13 +17,20 @@ module.exports = (sequelize, DataTypes) => {
             // define association here
             this.hasMany(models.Posts, {
                 foreignKey: "userId",
-                as: 'posts'
+                as: 'posts',
+                onDelete: 'CASCADE'
             })
+            this.hasMany(models.Comments, {
+                foreignKey: "userId",
+                onDelete: 'CASCADE',
+                as:"comment"
+            })
+
         }
 
-        toJSON() {
-            return {...this.get(), id: undefined, userId: undefined};
-        }
+        // toJSON() {
+        //     return {...this.get(), id: undefined, userId: undefined, uuid: undefined};
+        // }
     }
 
     User.init({

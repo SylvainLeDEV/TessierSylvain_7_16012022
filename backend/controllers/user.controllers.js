@@ -1,22 +1,21 @@
-const {User} = require("../models");
+const {User, Posts, Comments} = require("../models");
 
-module.exports.getAllUsers = ((req, res) => {
-    User.findAll()
+module.exports.getAllUsers = (req, res) => {
+    User.findAll({include:"posts"})
         .then((users) => {
             return res.status(200).send(users)
         })
         .catch((err) => {
             res.status(500).json({err: 'Somthing'})
         })
-});
+};
 
 module.exports.userInfo = (req, res, next) => {
-
     const uuid = req.params.uuid
     console.log(uuid)
     User.findOne({
         where: {uuid: uuid},
-        include: "posts"
+        include: [{model: Posts, as: "posts", include: ["comment"]}],
     })
         .then((user) => {
             user.posts.sort(function (a, b) {
@@ -25,9 +24,8 @@ module.exports.userInfo = (req, res, next) => {
             return res.status(200).json(user)
         })
         .catch((err) => {
-            return res.status(500).json({err: err})
+            return res.status(500).json({err})
         })
-
 }
 
 module.exports.deleteUser = (req, res, next) => {
@@ -37,14 +35,15 @@ module.exports.deleteUser = (req, res, next) => {
         where: {uuid: uuidUser},
     })
         .then((user) => {
-            console.log(user)
+            // console.log("ICI ", user)
 
-            if (user.uuid !== req.auth.userId) {
+            // console.log("CONTROLE : ", user.uuid, req.auth.uuidUserToken)
+            if (user.uuid !== req.auth.uuidUserToken) {
                 return res.status(400).json({
                     message: 'Unauthorized request',
                 })
             }
-            // user.destroy()
+            user.destroy()
             return res.status(200).json({message: 'User destroy'})
         })
         .catch((err) => {
@@ -53,12 +52,16 @@ module.exports.deleteUser = (req, res, next) => {
 }
 
 module.exports.updateUser = async (req, res, next) => {
-    // ATTENTION AJOUTER L'AUTH !!!
     const uuidUser = req.params.uuid
     const {firstName, lastName, email, poste, bio, picture} = req.body
 
     User.findOne({where: {uuid: uuidUser}})
         .then((user) => {
+            if (user.uuid !== req.auth.uuidUserToken) {
+                return res.status(400).json({
+                    message: 'Unauthorized request',
+                })
+            }
             user.firstName = firstName
             user.lastName = lastName
             user.email = email
