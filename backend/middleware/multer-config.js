@@ -8,7 +8,7 @@ const MIME_TYPES = {
 };
 
 const limits = {
-    fileSize : 5 * 1024 * 1024,
+    fileSize: 5 * 1024 * 1024,
     //5 242 880byte/Octets = 5Mo
 };
 
@@ -16,8 +16,13 @@ const types = Object.keys(MIME_TYPES)
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
+        console.log(file)
         if (types.includes(file.mimetype)) {
-            callback(null, 'images');
+            if (file.fieldname === "posts") {
+                callback(null, 'images/posts');
+            } else if (file.fieldname === "profile"){
+                callback(null,'images/profile')
+            }
         } else {
             callback(new Error("Only jpg, jpeg, png, gif"), true)
         }
@@ -30,4 +35,4 @@ const storage = multer.diskStorage({
     },
 });
 
-module.exports = multer({limits ,storage}).single('image');
+module.exports = multer({limits, storage}).fields([{name: 'posts', maxCount: 1}, {name: 'profile', maxCount: 1}]);

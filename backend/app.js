@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 require('./config/db');
 
 const {User} = require("./models");
+const path = require("path");
 
 const app = express();
 
@@ -40,6 +41,8 @@ app.use(rateLimite({
 }));
 
 // Router
+app.use('/images/posts', express.static(path.join(__dirname, 'images/posts')));
+app.use('/images/posts', express.static(path.join(__dirname, 'images/profile')));
 app.use('/api/user', userRoutes);
 app.use('/api/post', postRoutes);
 
