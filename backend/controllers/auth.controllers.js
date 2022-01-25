@@ -18,6 +18,7 @@ module.exports.signUp = (req, res) => {
                 lastName: req.body.lastName,
                 poste: req.body.poste,
                 isAdmin: req.body.isAdmin,
+                picture : `${req.protocol}://${req.get('host')}/images/profile/pictureProfile/firstPicture.png`,
                 password: hash
             })
                 .then((user) => {

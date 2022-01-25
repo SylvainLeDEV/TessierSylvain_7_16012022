@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const {
   Model
 } = require('sequelize');
+const fs = require("fs");
 module.exports = (sequelize, DataTypes) => {
   class Posts extends Model {
     /**
@@ -15,13 +16,14 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(models.User, {
         foreignKey:"userId",
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       });
 
       this.hasMany(models.Comments, {
         foreignKey: "postId",
         onDelete: 'CASCADE',
-        as:"comment"
+        as:"comment",
+        hooks: true
       })
 
     }
@@ -52,5 +54,13 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Posts',
   });
+  Posts.beforeDestroy(async (Posts) => {
+    console.log('ici')
+      const filename = Posts.imageUrl.split('/images/posts')[1];
+    console.log("filename", filename)
+      fs.unlink(`images/posts/${filename}`,(res) =>{
+        console.log(res)
+      })
+  })
   return Posts;
 };

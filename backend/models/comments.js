@@ -3,6 +3,7 @@ const {
   Model
 } = require('sequelize');
 const {v4: uuidv4} = require("uuid");
+const fs = require("fs");
 module.exports = (sequelize, DataType) => {
   class Comments extends Model {
     /**
@@ -52,5 +53,11 @@ module.exports = (sequelize, DataType) => {
     sequelize,
     modelName: 'Comments',
   });
+  Comments.beforeDestroy(async (comments) => {
+    const filename = comments.imageUrl.split('/images/comment')[1];
+    fs.unlink(`images/comment/${filename}`,(res) =>{
+      console.log(res)
+    })
+  })
   return Comments;
 };

@@ -16,8 +16,8 @@ router.delete('/:uuid', auth,postControllers.deletePost);
 
 // Routes for comments
 router.get('/comment-post/:uuid', postControllers.getCommentPost);
-router.patch('/create-comment-post/', postControllers.createCommentPost);
-router.put('/edit-comment-post/:uuid', postControllers.editCommentPost);
+router.patch('/create-comment-post/', multer, postControllers.createCommentPost);
+router.put('/edit-comment-post/:uuid', multer, postControllers.editCommentPost);
 router.delete('/delete-comment-post/:uuid', postControllers.deleteCommentPost);
 
 

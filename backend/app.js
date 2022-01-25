@@ -42,7 +42,9 @@ app.use(rateLimite({
 
 // Router
 app.use('/images/posts', express.static(path.join(__dirname, 'images/posts')));
-app.use('/images/posts', express.static(path.join(__dirname, 'images/profile')));
+app.use('/images/profile', express.static(path.join(__dirname, 'images/profile')));
+app.use('/images/profile/pictureProfile', express.static(path.join(__dirname, 'images/profile/pictureProfile')));
+app.use('/images/comment', express.static(path.join(__dirname, 'images/comment')));
 app.use('/api/user', userRoutes);
 app.use('/api/post', postRoutes);
 
