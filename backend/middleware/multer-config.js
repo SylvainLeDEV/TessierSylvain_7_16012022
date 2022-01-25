@@ -16,12 +16,14 @@ const types = Object.keys(MIME_TYPES)
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        console.log(file)
         if (types.includes(file.mimetype)) {
             if (file.fieldname === "posts") {
                 callback(null, 'images/posts');
             } else if (file.fieldname === "profile"){
                 callback(null,'images/profile')
+            } else if (file.fieldname === "comment"){
+                console.log(file)
+                callback(null,'images/comment')
             }
         } else {
             callback(new Error("Only jpg, jpeg, png, gif"), true)
@@ -30,9 +32,10 @@ const storage = multer.diskStorage({
     filename: (req, file, callback) => {
         const name = file.originalname.split(' ').join('_');
         const extension = MIME_TYPES[file.mimetype];
-        const nameEdit = name.split("." + extension).join("")
+        const nameEdit = name.slice(".", -4)
         callback(null, nameEdit + Date.now() + '.' + extension);
     },
 });
 
-module.exports = multer({limits, storage}).fields([{name: 'posts', maxCount: 1}, {name: 'profile', maxCount: 1}]);
+module.exports = multer({limits, storage}).fields([{name: 'posts', maxCount: 1}, {name: 'profile', maxCount: 1},
+    {name: "comment", maxCount: 1}]);

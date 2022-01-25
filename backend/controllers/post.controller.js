@@ -3,10 +3,7 @@ const {User} = require('../models/');
 const {Comments} = require('../models/')
 // const {uploadErrors} = require("../utils/errors.utils");
 const fs = require("fs");
-// const {promisify} = require("util");
-// const pipeline = promisify(require('stream').pipeline);
-//
-// const ObjectID = require('mongoose').Types.ObjectId;
+
 
 module.exports.readPost = (req, res, next) => {
     Posts.findAll({include: [User, Comments]})
@@ -23,10 +20,9 @@ module.exports.readPost = (req, res, next) => {
 
 module.exports.createPost = async (req, res, next) => {
     const {content, videoUrl, userUuid} = req.body
-    const imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    const imageUrl = `${req.protocol}://${req.get('host')}/images/posts/${req.files.posts[0].filename}`
     User.findOne({where: {uuid: userUuid}})
         .then((user) => {
-            console.log(user)
             if (!user)
                 return res.status(401).json({message: "Utilisateur non trouvé !"})
             Posts.create({content, imageUrl, videoUrl, userId: user.id})
@@ -68,7 +64,6 @@ module.exports.updatePost = (req, res, next) => {
     // METTRE EN PLACE le isAdmin
     const uuidPost = req.params.uuid
     const {content, videoUrl} = req.body
-    console.log(req.body)
     Posts.findOne({where: {uuid: uuidPost}})
         .then((post) => {
             const filename = post.imageUrl.split('/images/posts')[1];
@@ -82,17 +77,17 @@ module.exports.updatePost = (req, res, next) => {
             //     })
             // }
 
-            if (req.file) {
+            if (req.files.posts) {
                 fs.unlink(`images/posts/${filename}`, () => {
                     const postObject = {
                         content,
                         videoUrl,
-                        imageUrl:`${req.protocol}://${req.get('host')}/images/posts/${req.file.filename}`
+                        imageUrl: `${req.protocol}://${req.get('host')}/images/posts/${req.files.posts[0].filename}`
                     }
                     post.update(postObject, {
-                        where : req.params.uuid
+                        where: req.params.uuid
                     }).then(() => {
-                        return res.status(200).json({message: 'Post upDate'})
+                        return res.status(200).json({message: 'Post upDate with image'})
                     })
                         .catch((err) => {
                             return res.status(400).json({err, message: "Une erreur dans les donées"})
@@ -104,7 +99,7 @@ module.exports.updatePost = (req, res, next) => {
                     videoUrl,
                 }
                 post.update(postObject, {
-                    where : req.params.uuid
+                    where: req.params.uuid
                 }).then(() => {
                     return res.status(200).json({message: 'Post upDate'})
                 })
@@ -138,7 +133,6 @@ module.exports.deletePost = (req, res, next) => {
             }
             const filename = post.imageUrl.split('/images/posts')[1];
             fs.unlink(`images/posts/${filename}`, {})
-
             post.destroy()
             return res.status(200).json({message: 'Post destroy'})
         })
@@ -208,12 +202,14 @@ module.exports.deletePost = (req, res, next) => {
 //
 
 
-module.exports.createCommentPost = (req, res, next) => {
-    const {content, imageUrl, videoUrl, postUuid, posterId} = req.body
+module.exports.createCommentPost = async (req, res, next) => {
+    const {content, videoUrl, postUuid, posterId} = req.body
+    console.log("Req.file", req.file)
+    const imageUrl = `${req.protocol}://${req.get('host')}/images/comment/${req.files.comment[0].filename}`
     User.findOne({where: {uuid: posterId}})
         .then((user) => {
             const userId = user.id
-            console.log(userId)
+            console.log("la userid", userId)
             Posts.findOne({where: {uuid: postUuid}})
                 .then((post) => {
                     console.log(post)
@@ -266,24 +262,52 @@ module.exports.editCommentPost = (req, res, next) => {
     // METTRE EN PLACE le isAdmin
 
     const uuidComment = req.params.uuid
-    const {content, imageUrl, videoUrl} = req.body
+    const {content, videoUrl} = req.body
     Comments.findOne({where: {uuid: uuidComment}})
         .then((comment) => {
+            const filename = comment.imageUrl.split('/images/comment')[1];
             if (!comment) {
                 return res.status(401).json({message: "Pas de comentaire trouvé !"})
             }
-            console.log(comment)
 
-            comment.content = content
-            comment.imageUrl = imageUrl
-            comment.videoUrl = videoUrl
-            comment.save().then(() => {
-                return res.status(200).json({message: 'comment upDate'})
-            })
-                .catch((err) => {
-                    return res.status(400).json({err, message: "Une erreur dans les donées"})
+            // if (comment.User.uuid !== req.auth.uuidUserToken) {
+            //     return res.status(400).json({
+            //         message: 'Unauthorized request',
+            //     })
+            // }
+            if (req.files.comment) {
+                console.log(req.files)
+                fs.unlink(`images/comment/${filename}`, () => {
+                    const commentObject = {
+                        content,
+                        videoUrl,
+                        imageUrl: `${req.protocol}://${req.get('host')}/images/comment/${req.files.comment[0].filename}`
+                    }
+                    comment.update(commentObject, {
+                        where: req.params.uuid
+                    }).then(() => {
+                        return res.status(200).json({message: 'Post upDate with image'})
+                    })
+                        .catch((err) => {
+                            return res.status(400).json({err, message: "Une erreur dans les donées"})
+                        })
                 })
+            } else {
+                const commentObject = {
+                    content,
+                    videoUrl
+                }
+                comment.update(commentObject, {
+                    where :req.params.uuid
+                }).then(() => {
+                    return res.status(200).json({message: 'comment upDate'})
+                })
+                    .catch((err) => {
+                        return res.status(400).json({err, message: "Une erreur dans les donées"})
+                    })
+            }
         })
+        .catch((err) => res.status(500).json({ err ,message: "Probleme sur update commentaire"}))
 }
 
 module.exports.deleteCommentPost = (req, res, next) => {
@@ -296,10 +320,13 @@ module.exports.deleteCommentPost = (req, res, next) => {
         where: {uuid: uuidComment},
     })
         .then((comment) => {
+            console.log(comment)
 
             if (!comment) {
                 return res.status(401).json({message: "Pas de commentaire trovué ! "})
             }
+            const filename = comment.imageUrl.split('/images/comment/')[1];
+            fs.unlink(`images/comment/${filename}`, () => {})
 
             console.log(comment)
             comment.destroy()
