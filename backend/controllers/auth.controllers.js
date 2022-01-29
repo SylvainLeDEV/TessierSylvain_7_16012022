@@ -10,6 +10,7 @@ const {User} = require("../models");
 
 
 module.exports.signUp = (req, res) => {
+    console.log(req.body)
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
             User.create({
@@ -28,7 +29,7 @@ module.exports.signUp = (req, res) => {
                     res.status(500).json({err: err, message: 'problème sur /register ou fonction SignIn'})
                 })
         })
-        .catch(error => res.status(500).json({error: error}));
+        .catch(error => res.status(500).json({error: error, message: 'problème sur /register ou fonction SignIn'}));
 };
 
 exports.login = (req, res, next) => {
@@ -67,24 +68,7 @@ exports.login = (req, res, next) => {
 };
 
 
-//
-// //Vidéo : 2h00
-// module.exports.signIn = async (req, res) => {
-//     const {email, password} = req.body
-//     console.log(email, password)
-//
-//     try {
-//         const user = await userModel.login(email, password);
-//         const token = createToken(user._id);
-//         res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge})
-//         res.status(200).json({user: user._id})
-//     } catch (err) {
-//         const errors = errorsUtils.signInErrors(err)
-//         return res.status(200).send({ errors })
-//     }
-// };
-//
-// module.exports.logout = (req, res) => {
-//     res.cookie('jwt', '', {maxAge: 1});
-//     res.redirect("/");
-// }
+module.exports.logout = (req, res) => {
+    res.cookie('jwt', '', {maxAge: 1});
+    res.redirect("/");
+}

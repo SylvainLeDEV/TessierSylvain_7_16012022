@@ -4,7 +4,8 @@ const dotenv = require('dotenv').config({path: './config/.env', encoding: "latin
 // Un middleware est un bloc de code qui traite les requêtes et réponses de votre application.
 module.exports = (req, res, next) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
+    // .split(' ')[1]
+        const token = req.headers.authorization;
         const decodedToken = jsonwebtoken.decode(token, process.env.TOKEN_KEY);
         const uuidUserToken = decodedToken.uuidUser;
         const isAdminToken = decodedToken.isAdmin;
@@ -14,11 +15,12 @@ module.exports = (req, res, next) => {
         if (req.body.uuid && req.body.uuid !== uuidUserToken) {
             return res.status(401).json({message: "invalid ID user"})
         } else {
+            console.log("Token OK")
             next();
         }
     } catch {
-        res.status(400).json({
-            error: new Error('Invalid request!')
+        return res.status(400).json({
+            message : 'Invalid request!'
         });
     }
 };
