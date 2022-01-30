@@ -6,13 +6,28 @@ const instance = axios.create({
     baseURL: 'http://localhost:3000/api/user/',
 });
 
-export default createStore({
-    state: {
-        status: '',
-        user: {
+let user = localStorage.getItem('user')
+if (!user) {
+    user = {
+        uuidUser: "-1",
+        token: "",
+    }
+} else {
+    try {
+        user = JSON.parse(user)
+        instance.defaults.headers.common['Authorization'] = user.token;
+    } catch (ex) {
+        user = {
             uuidUser: "-1",
             token: "",
-        },
+        }
+    }
+}
+
+export default createStore({
+    state: {
+        status: [''],
+        user: user,
         userInfos: {},
     },
 
@@ -23,11 +38,20 @@ export default createStore({
 
         logUser: function (state, user) {
             instance.defaults.headers.common['Authorization'] = user.token;
+            localStorage.setItem('user', JSON.stringify(user))
             state.user = user;
         },
 
         userInfos: function (state, userInfos) {
             state.userInfos = userInfos;
+        },
+
+        logout: function (state) {
+            state.user = {
+                uuidUser: "-1",
+                token: "",
+            }
+            localStorage.removeItem('user')
         }
 
 
@@ -63,7 +87,6 @@ export default createStore({
                     password: userInfo.password
                 })
                     .then((response) => {
-                        commit("setStatus", "")
                         commit("logUser", response.data)
                         resolve(response)
                     })
@@ -76,13 +99,13 @@ export default createStore({
 
         getUserInfos: ({commit}, uuidUser) => {
             console.log("test : ", uuidUser)
-            instance.get('/'+ uuidUser )
+            instance.get('/' + uuidUser)
                 .then((response) => {
                     commit("userInfos", response.data)
                     console.log(response)
-
                 })
                 .catch((error) => {
+                    commit("setStatus", "error_auth")
                     console.log(error)
                 });
         }

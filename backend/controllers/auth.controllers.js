@@ -19,7 +19,7 @@ module.exports.signUp = (req, res) => {
                 lastName: req.body.lastName,
                 poste: req.body.poste,
                 isAdmin: req.body.isAdmin,
-                picture : `${req.protocol}://${req.get('host')}/images/profile/pictureProfile/firstPicture.png`,
+                picture : `${req.protocol}://${req.get('host')}/images/profile/pictureProfile/firstProfile.png`,
                 password: hash
             })
                 .then((user) => {
@@ -56,7 +56,7 @@ exports.login = (req, res, next) => {
                                 isAdmin: user.isAdmin
                             },
                             process.env.TOKEN_KEY,
-                            {expiresIn: '24h'}
+                            {expiresIn: "1h"}
                         )
                     })
                 })

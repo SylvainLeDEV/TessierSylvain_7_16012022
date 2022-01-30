@@ -49,7 +49,7 @@
         <span v-else>Connexion</span>
       </button>
       <button @click="createAccount" class="button" :class="{'button--disabled' : !validatedFileds}" v-else>
-        <span v-if=" status == 'loading' ">Création en cours...</span>
+        <span v-if=" status == 'loading' ">Création en cours... <Loader/></span>
         <span v-else>Créer un compte</span>
       </button>
     </div>
@@ -62,10 +62,11 @@
 <script>
 
 import {mapState} from 'vuex'
+import Loader from "@/components/Loader";
 
 export default {
   name: "login",
-
+  components: {Loader},
   data: function () {
     return {
       mode: 'login',
@@ -77,6 +78,14 @@ export default {
 
     }
   },
+
+  mounted: function () {
+    if (this.$store.state.user.uuidUser !== "-1") {
+      this.$router.push("/profile/")
+      return;
+    }
+  },
+
   computed: {
     validatedFileds: function () {
       if (this.mode == 'create') {
@@ -108,7 +117,7 @@ export default {
         email: this.email,
         password: this.password
       }).then(() => {
-         this.$router.push("/profile")
+        this.$router.push("/profile")
       }).catch((error) => {
         console.log(error)
       })
@@ -173,7 +182,8 @@ export default {
     color: black;
 
   }
-  &__invalid{
+
+  &__invalid {
     color: red;
   }
 

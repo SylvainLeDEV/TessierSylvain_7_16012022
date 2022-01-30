@@ -26,7 +26,11 @@ app.use((req, res, next) => {
 
 
 // Par exemple, Node.js a un module de cookies avec HttpOnly, et un middleware appelé Helmet. XSS
-app.use(helmet());
+//X-Frame-Options :afin d'éviter les attaques de clickjacking
+app.use(helmet.frameguard({
+        action : "SAMEORIGIN"
+    })
+);
 
 // Avec ceci, Express prend toutes les requêtes qui ont comme Content-Type  application/json
 // parse application/json, basically parse incoming Request Object as a JSON Object

@@ -49,6 +49,10 @@ module.exports = (sequelize, DataType) => {
       type:DataType.INTEGER,
       allowNull: false
     },
+    userName:{
+      allowNull: false,
+      type: DataType.STRING
+    },
   }, {
     sequelize,
     modelName: 'Comments',
