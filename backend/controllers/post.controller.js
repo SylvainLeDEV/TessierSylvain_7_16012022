@@ -25,7 +25,7 @@ module.exports.createPost = async (req, res, next) => {
         .then((user) => {
             if (!user)
                 return res.status(401).json({message: "Utilisateur non trouvé !"})
-            Posts.create({content, imageUrl, videoUrl, userId: user.id})
+            Posts.create({content, imageUrl, videoUrl, userName:user.firstName ,userId: user.id})
                 .then(() => {
                         res.status(201).json({
                             message: 'Post saved successfully!'
@@ -217,7 +217,7 @@ module.exports.createCommentPost = async (req, res, next) => {
                         return res.status(401).json({message: "Post non trouvé !"})
                     console.log(post)
 
-                    Comments.create({content, imageUrl, videoUrl, postId: post.id, posterId: posterId, userId: userId})
+                    Comments.create({ userName: user.firstName,content, imageUrl, videoUrl, postId: post.id, posterId: posterId, userId: userId})
                         .then(() => {
                                 res.status(201).json({
                                     message: 'Comment saved successfully!'

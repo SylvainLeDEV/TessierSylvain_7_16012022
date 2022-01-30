@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.INTEGER,
       allowNull: false
     },
+    userName:{
+      allowNull: false,
+      type: DataTypes.STRING
+    },
     imageUrl: {
       allowNull: true,
       type: DataTypes.STRING
