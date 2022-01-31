@@ -30,7 +30,7 @@ npm install
 npm start 
 ```
 
-###Contact
-Sylvain TESSIER : [dev.tess.sylvain@gmail.com](dev.tess.sylvain@gmail.com)
+### Contact
+Sylvain TESSIER : <dev.tess.sylvain@gmail.com>
 
 
