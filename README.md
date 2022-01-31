@@ -1,27 +1,36 @@
-![Piiquante](frontend/assets/images/16275605596354_PiiquanteLogo.png)
-# PIIQUANTE
+![Groupomania](frontend/src/assets/Groupomania_logos/icon-left-font-monochrome-black.svg)
+#**GROUPOMANIA**
 
-● Application Web de critique des sauces piquantes "Hot takes"
+Le site Groupomania, un réseau social d’entreprise.
+Project réalisé par TESSIER Sylvain pour Groupomania
 
-● Stack : MongoDB, Express, Node.JS Featuring JWT, Mongoose, Multer, Bcrypt
+
+● Stack : Express, Node.JS,JWT, Sequelize, Multer, Bcrypt, VueJS 3 
 
 ## Description
 
-Les sauces piquantes sont de plus en plus populaires, en grande partie grâce à la série YouTube « Hot Ones » . C’est pourquoi ce nouveau client, la marque de condiments à base de piment Piiquante, veut développer une application web de critique des sauces piquantes appelée « Hot Takes » 
+Création de pages dynamiques pour un réseau social,  
+Création de **messages/commentaires**, **suppression** et **modification**.   
 
-* MongoDB - document database
-* Express(.js) - Node.js web framework
-* Node(.js) - the premier JavaScript web server
+Développer avec :
 
+- [SASS](https://sass-lang.com/documentation)  
+- [VueJS 3](https://v3.vuejs.org/)  
+- [vuetifyJS](https://next.vuetifyjs.com/en)  
+- [Sequelize ORM](https://sequelize.org/v7/)  
+- [MySQL](https://www.mysql.com/fr/)
 
 ## Getting Started
 
 ### Dependencies
-For back and front : 
+For back and front :
+
 ```
 npm install
 npm start 
 ```
 
+###Contact
+Sylvain TESSIER : [dev.tess.sylvain@gmail.com](dev.tess.sylvain@gmail.com)
 
 
