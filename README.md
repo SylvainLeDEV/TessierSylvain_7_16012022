@@ -31,6 +31,6 @@ npm start
 ```
 
 ###Contact
-Sylvain TESSIER : [dev.tess.sylvain@gmail.com](dev.tess.sylvain@gmail.com)
+Sylvain TESSIER : <dev.tess.sylvain@gmail.com>
 
 
