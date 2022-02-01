@@ -1,33 +1,52 @@
 <template>
-    <Loader/>
+<!--  <Loader/>-->
+  <v-app>
+    <v-layout style="overflow: hidden">
+      <v-app-bar
+          absolute
+          color="deep-purple"
+      >
+        <v-app-bar-nav-icon v-if="$route.path !== '/'" @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-    <div id="nav">
+        <v-toolbar-title>Groupomania</v-toolbar-title>
+      </v-app-bar>
+      <v-navigation-drawer v-if="$route.path !== '/'"
+                           v-model="drawer"
+                           absolute
+                           temporary >
+        <v-list nav dense >
+          <v-list-item-group v-model="group" active-class="deep-purple--text text--accent-4">
+            <v-list-item prepend-icon="mdi-home" title="Groupomania" to="/posts"></v-list-item>
 
-      <router-link to="/">Login</router-link>
-      |
-      <router-link to="/profile">Profile</router-link>
-      |
-      <router-link to="/home">Home</router-link>
-      |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+            <v-list-item prepend-icon="mdi-account" title="Profile" to="/profile"></v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-navigation-drawer>
+      <v-main>
+        <v-card
+            class="mx-auto overflow-hidden"
+            height="400"
+        >
+          <router-view/>
+        </v-card>
+      </v-main>
+    </v-layout>
+  </v-app>
 </template>
 
 <script>
 
-import Loader from "@/components/Loader";
-// import {mapState} from "vuex";
+// import Loader from "@/components/Loader";
+
 export default {
-  components:{Loader},
-  // computed: {
-  //   ...mapState({
-  //     user: "userInfos"
-  //   })
-  // },
+  name: 'App',
+  // components: {Loader},
+  data: () => ({
+    drawer: false,
+    group: null,
+  }),
 }
 </script>
-
 
 <style lang="scss">
 #app {
@@ -73,13 +92,9 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 32px;
+  padding: 0 15px;
 }
 
-img {
-  max-width: 100%;
-  border-radius: 8px;
-}
 
 .card {
   max-width: 100%;
@@ -87,7 +102,7 @@ img {
   background: white;
   border-radius: 16px;
   padding: 32px;
-
+  z-index: -1;
 }
 
 .card__title {
@@ -136,6 +151,4 @@ img {
   cursor: not-allowed;
   background: #cecece;
 }
-
-
 </style>
