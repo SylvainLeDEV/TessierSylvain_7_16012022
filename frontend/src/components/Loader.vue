@@ -27,7 +27,8 @@ export default {
 
 $num-letter: 12;
 $anim-dur: 1000ms;
-$anim-delay: $anim-dur / $num-letter;
+//$anim-delay: $anim-dur / $num-letter;
+$anim-delay:calc(1000ms / 12);
 
 @import url('https://fonts.googleapis.com/css2?family=Bilbo+Swash+Caps&display=swap');
 .loadcontent {
