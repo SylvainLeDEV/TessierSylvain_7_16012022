@@ -1,5 +1,5 @@
 ![Groupomania](frontend/src/assets/Groupomania_logos/icon-left-font-monochrome-black.svg)
-#**GROUPOMANIA**
+# **GROUPOMANIA**
 
 Le site Groupomania, un réseau social d’entreprise.
 Project réalisé par TESSIER Sylvain pour Groupomania
@@ -30,7 +30,11 @@ npm install
 npm start 
 ```
 
+<<<<<<< HEAD
 ###Contact
+=======
+### Contact
+>>>>>>> 65ec8375f5bc4568902dc9a94dd3e7d5bec50b19
 Sylvain TESSIER : <dev.tess.sylvain@gmail.com>
 
 
