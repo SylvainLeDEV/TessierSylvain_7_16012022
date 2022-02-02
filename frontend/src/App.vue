@@ -8,7 +8,7 @@
       >
         <v-app-bar-nav-icon v-if="$route.path !== '/'" @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-        <v-toolbar-title>Groupomania</v-toolbar-title>
+        <v-img class="groupomania" src="@/assets/Groupomania_logos/icon-left-font-monochrome-black.png"/>
       </v-app-bar>
       <v-navigation-drawer v-if="$route.path !== '/'"
                            v-model="drawer"
@@ -24,9 +24,8 @@
       </v-navigation-drawer>
       <v-main>
         <v-card
-            class="mx-auto overflow-hidden"
-            height="400"
-        >
+            class="mx-auto overflow-auto"
+            height="100vh" >
           <router-view/>
         </v-card>
       </v-main>
@@ -76,6 +75,18 @@ export default {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.groupomania{
+
+}
+
+#app > div > div > div > header > div > div > img{
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 #app {

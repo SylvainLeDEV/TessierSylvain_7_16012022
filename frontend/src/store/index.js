@@ -29,7 +29,8 @@ export default createStore({
         status: [''],
         user: user,
         userInfos: {},
-        pictureProfile: ''
+        pictureProfile: '',
+        createdAt:''
     },
 
     mutations: {
@@ -45,6 +46,7 @@ export default createStore({
 
         userInfos: function (state, userInfos) {
             state.userInfos = userInfos;
+            state.createdAt = userInfos.createdAt
         },
 
         logout: function (state) {
@@ -102,7 +104,6 @@ export default createStore({
         },
 
         getUserInfos: ({commit}, uuidUser) => {
-            console.log("test : ", uuidUser)
             instance.get('/' + uuidUser)
                 .then((response) => {
                     commit("userInfos", response.data)
