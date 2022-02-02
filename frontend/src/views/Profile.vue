@@ -2,13 +2,7 @@
   <!--  //Déconexion-->
   <div class="card">
 
-    <div class="form-row">
-      <button @click="logout" class="button">
-        Déconnexion
-      </button>
-    </div>
-
-    <h1 class="card__title">{{ user.firstName }}</h1>
+    <h1 class="card__title">{{ user.firstName }}, {{ user.lastName }} </h1>
     <p class="card__subtitle">Voilà donc qui je suis...</p>
 
     <!--// L'image de PROFILE-->
@@ -36,10 +30,35 @@
              style="display: none"
              ref="fileInputPirctureProfile"
              accept="image/png, image/jpeg, image/jpg, image/gif"
-             size="5 * 1024 * 1024"
+             size="5242880"
              @change="onFilePictureProfile">
     </div>
 
+    <!--Présentation PROFILE-->
+
+    <div class="profile">
+      <p class="profile__email"> {{ user.email }}</p>
+
+      <p class="profile__bio"> {{ user.bio }} </p>
+
+      <p class="profile__creatAt"> {{ user.createdAt }} </p>
+
+
+    </div>
+
+    <!--//Butoon DECONNEXION / MODOFIER / SUPPRIMER PROFILE-->
+    <div class="form-row">
+      <button @click="logout" class="button">
+        Déconnexion
+      </button>
+      <button class="button">
+        <UpdateInfoUser/>
+      </button>
+    </div>
+
+    <button @click="deleteProfile" color="red" class="button">
+      Supprimer le profile (Définitif)
+    </button>
 
     <!--    //Pour les POSTS-->
     <div class="posts" v-for="post in user.posts" :key="post.id">
@@ -54,29 +73,37 @@
       </div>
     </div>
 
+
   </div>
 
 </template>
 
 <script>
 import {mapState} from 'vuex'
+import UpdateInfoUser from "@/components/UpdateInfoUser";
 
 export default {
   name: "Profile",
-  mounted: function () {
+  components: {UpdateInfoUser},
+  beforeMount: function() {
     if (this.$store.state.user.uuidUser == "-1") {
       this.$router.push("/")
       return;
     }
-
     const uuidUser = this.$store.state.user.uuidUser
-    this.$store.dispatch('getUserInfos', uuidUser);
+    this.$store.dispatch('getUserInfos', uuidUser)
+  },
+  mounted: function () {
+
+    console.log(this.$store.state.createdAt)
+
   },
 
   data() {
     return {
       imageUrl: "",
-      image: null
+      image: null,
+      profileCreatedAt: ""
     }
   },
 
@@ -87,6 +114,7 @@ export default {
       this.$router.push("/")
     },
 
+    // Modifier la photo de profile
     updatePictureProfile: function () {
       this.$refs.fileInputPirctureProfile.click();
     },
@@ -108,13 +136,10 @@ export default {
       const fileReader = new FileReader()
       fileReader.addEventListener('load', () => {
         this.imageUrl = fileReader.result
-        console.log(this.imageUrl)
       })
       fileReader.readAsDataURL(files)
       this.image = files
-      console.log(this.image)
     },
-
     validPictureProfile: function () {
       if (!this.image) {
         return;
@@ -122,7 +147,6 @@ export default {
 
       const formData = new FormData()
       formData.append('profile', this.image)
-      console.log(formData.get('profile'))
 
       const payload = {
         uuidUser: this.$store.state.user.uuidUser,
@@ -134,12 +158,16 @@ export default {
       this.imageUrl = ""
     },
 
+    //Modifier les information utilisateur
+    updateProfile: function () {
+    },
   },
 
   computed: {
     ...mapState({
       user: "userInfos",
-      picture : "pictureProfile"
+      createdAt: "createdAt",
+      picture: "pictureProfile"
     }),
   }
 }
@@ -153,16 +181,19 @@ export default {
 
   &__picture-container {
 
-    width: 50%;
+    width: 200px;
+    height: 200px;
     margin: 0 auto;
-    border: 2px solid burlywood;
+    border: 3px solid burlywood;
     border-radius: 50%;
     position: relative;
 
 
     .card__picture-img {
       border-radius: 50%;
-      max-width: 100%;
+      width: 99%;
+      height: 99%;
+      object-fit: cover;
     }
 
     .card__picture-btn {
@@ -174,7 +205,7 @@ export default {
     .card__picture-btn-valid {
       position: absolute;
       right: 75%;
-      bottom: 6%;
+      bottom: 4%;
     }
   }
 
@@ -182,6 +213,15 @@ export default {
     height: 100px;
   }
 
+  .form-row {
+    display: flex;
+    flex: 1;
+    gap: 16px;
+
+    .button {
+      margin: 15px 0;
+    }
+  }
 }
 
 </style>
