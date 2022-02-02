@@ -94,7 +94,7 @@ module.exports.updateUser = async (req, res, next) => {
                     user.update(profileObject, {
                         where: req.params.uuid
                     }).then(() => {
-                        return res.status(200).json({message: 'User upDate with picture'})
+                        return res.status(200).json({message: 'User upDate with picture', profileObject})
                     })
                         .catch((err) => {
                             return res.status(400).json({err, message: "Une erreur dans les donées"})
@@ -120,7 +120,7 @@ module.exports.updateUser = async (req, res, next) => {
             }
         })
         .catch((err) => {
-            return res.status(500).json({err: err})
+            return res.status(500).json({message: "Profile picture error" ,err: err})
         })
 }
 

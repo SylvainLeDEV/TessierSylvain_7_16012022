@@ -29,6 +29,7 @@ export default createStore({
         status: [''],
         user: user,
         userInfos: {},
+        pictureProfile: ''
     },
 
     mutations: {
@@ -52,8 +53,11 @@ export default createStore({
                 token: "",
             }
             localStorage.removeItem('user')
-        }
+        },
 
+        updatePictureProfile: function (state, updatePictureProfile) {
+            state.pictureProfile = updatePictureProfile
+        }
 
     },
     actions: {
@@ -102,13 +106,34 @@ export default createStore({
             instance.get('/' + uuidUser)
                 .then((response) => {
                     commit("userInfos", response.data)
+                    commit("updatePictureProfile", response.data.picture)
                     console.log(response)
                 })
                 .catch((error) => {
                     commit("setStatus", "error_auth")
                     console.log(error)
                 });
-        }
+        },
+
+        updatePictureProfile: ({commit}, payload) => {
+            console.log(payload.picture)
+            console.log(payload.uuidUser)
+            instance.put('/' + payload.uuidUser, payload.picture
+                , {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then((response) => {
+                    commit("setStatus", "picture_upload")
+                    commit("updatePictureProfile", response.data.profileObject.picture)
+                    console.log(response.data.profileObject.picture)
+                })
+                .catch((erro) => {
+                    commit("setStatus", "picture_error")
+                    console.log(erro)
+                })
+        },
 
     },
     modules: {}
