@@ -95,6 +95,7 @@ export default {
           return false;
         }
       } else {
+        console.log(this.email)
         if (this.email != "" && this.password != "") {
           return true;
         } else {
