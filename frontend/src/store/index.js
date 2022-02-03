@@ -29,9 +29,22 @@ export default createStore({
         status: [''],
         user: user,
         userInfos: {},
+        dataUserForInfos :{
+         firstName: "",
+         lastName:"",
+         email:"",
+        },
         pictureProfile: '',
-        createdAt:''
+        createdAt:{
+            createdAt:"",
+            temps :""
+        }
     },
+    getters :{
+        getUser: function (state) {
+            return state.userInfos
+        },
+    } ,
 
     mutations: {
         setStatus: function (state, status) {
@@ -46,7 +59,23 @@ export default createStore({
 
         userInfos: function (state, userInfos) {
             state.userInfos = userInfos;
-            state.createdAt = userInfos.createdAt
+
+            const dateCreatProfile = new Date(userInfos.createdAt)
+            const calculDepuisLaCreation = dateCreatProfile - Date.now()
+            let tempsDepuisLaCreation = new Date(calculDepuisLaCreation)
+            let dateLocale = dateCreatProfile.toLocaleString('fr-FR',{
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric'});
+
+            state.createdAt.temps = tempsDepuisLaCreation.getDay()
+            state.createdAt.createdAt = dateLocale
+            state.dataUserForInfos.firstName = userInfos.firstName
+            state.dataUserForInfos.lastName = userInfos.lastName
+            state.dataUserForInfos.email = userInfos.email
         },
 
         logout: function (state) {

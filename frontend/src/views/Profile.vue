@@ -39,9 +39,13 @@
     <div class="profile">
       <p class="profile__email"> {{ user.email }}</p>
 
+      <p class="profile__creatAt"> {{ createdAt.createdAt }} </p>
+      <p class="profile__temps"> Parmi nous depuis :  {{ createdAt.temps }} jours </p>
+
+      <p class="profile__poste"> {{ user.poste }} </p>
+
       <p class="profile__bio"> {{ user.bio }} </p>
 
-      <p class="profile__creatAt"> {{ user.createdAt }} </p>
 
 
     </div>
@@ -95,7 +99,6 @@ export default {
   },
   mounted: function () {
 
-    console.log(this.$store.state.createdAt)
 
   },
 
@@ -166,6 +169,7 @@ export default {
   computed: {
     ...mapState({
       user: "userInfos",
+      //temps passé depuis la création du profile en jour !
       createdAt: "createdAt",
       picture: "pictureProfile"
     }),
