@@ -35,6 +35,8 @@ export default createStore({
          email:"",
         },
         pictureProfile: '',
+        poste:'',
+        bio:'',
         createdAt:{
             createdAt:"",
             temps :""
@@ -67,15 +69,15 @@ export default createStore({
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric'});
+                day: 'numeric'});
 
             state.createdAt.temps = tempsDepuisLaCreation.getDay()
             state.createdAt.createdAt = dateLocale
             state.dataUserForInfos.firstName = userInfos.firstName
             state.dataUserForInfos.lastName = userInfos.lastName
             state.dataUserForInfos.email = userInfos.email
+            state.bio = userInfos.bio
+
         },
 
         logout: function (state) {
@@ -88,6 +90,12 @@ export default createStore({
 
         updatePictureProfile: function (state, updatePictureProfile) {
             state.pictureProfile = updatePictureProfile
+        },
+        updateUserPoste: function (state, updateUserPoste) {
+            state.poste = updateUserPoste
+        },
+        updateUserBio: function (state, updateUserBio) {
+            state.bio = updateUserBio
         }
 
     },
@@ -145,6 +153,25 @@ export default createStore({
                 });
         },
 
+        updateUserInfos: ({commit}, payloadUserInfos) => {
+            console.log(payloadUserInfos)
+            console.log(payloadUserInfos.dataUser)
+            instance.put('/' + payloadUserInfos.uuidUser, payloadUserInfos.dataUser, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((response) => {
+                    commit('setStatus', 'userInfosUpdate')
+                    console.log(response)
+                })
+                .catch((err) => {
+                    commit("setStatus",'userInfosUpdate_error' )
+                    console.log(err)
+                })
+        },
+
         updatePictureProfile: ({commit}, payload) => {
             console.log(payload.picture)
             console.log(payload.uuidUser)
@@ -164,6 +191,47 @@ export default createStore({
                     console.log(erro)
                 })
         },
+
+        updateUserBio: ({commit}, payloadUpdateBio) => {
+            console.log(payloadUpdateBio)
+            console.log(payloadUpdateBio.updateBio)
+            instance.put('/' + payloadUpdateBio.uuidUser, payloadUpdateBio.updateBio, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((response) => {
+                    commit('setStatus', 'update_bio')
+                    commit('updateUserBio', response.data.profileObject.bio)
+                    console.log(response)
+                })
+                .catch((err) => {
+                    commit("setStatus",'update_bio_error' )
+                    console.log(err)
+                })
+        },
+
+        updateUserPoste: ({commit}, payloadUpdatePoste) => {
+            console.log(payloadUpdatePoste)
+            console.log(payloadUpdatePoste.updatePoste)
+            instance.put('/' + payloadUpdatePoste.uuidUser, payloadUpdatePoste.updatePoste, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((response) => {
+                    commit('setStatus', 'update_poste')
+                    commit('updateUserPoste', response.data.profileObject.poste)
+                    console.log(response)
+                })
+                .catch((err) => {
+                    commit("setStatus",'update_poste_error' )
+                    console.log(err)
+                })
+        },
+
 
     },
     modules: {}

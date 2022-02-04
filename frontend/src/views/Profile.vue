@@ -37,16 +37,51 @@
     <!--Présentation PROFILE-->
 
     <div class="profile">
-      <p class="profile__email"> {{ user.email }}</p>
+      <p class="profile__email"> Email : {{ user.email }}</p>
 
-      <p class="profile__creatAt"> {{ createdAt.createdAt }} </p>
-      <p class="profile__temps"> Parmi nous depuis :  {{ createdAt.temps }} jours </p>
+      <p class="profile__creatAt"> Nous a rejoints le : {{ createdAt.createdAt }} </p>
+      <p class="profile__temps"> ça fait <span> {{ createdAt.temps }} jours </span> que tu es parmi nous en tant que :
+      </p>
+      <div>
+        <select v-model="poste" name="poste" id="poste" @change="updatePoste" ref="poste" class="profile__poste">
+          <option value="">{{ user.poste }}</option>
+          <option value="Directeur général">Directeur général</option>
+          <option value="Digital Brand Manager">Digital Brand Manager</option>
+          <option value="Responsable communication">Responsable communication</option>
+          <option value="Responsable marketing">Responsable marketing</option>
+          <option value="Développeur">Développeur</option>
+          <option value="Designer">Designer</option>
+        </select>
+      </div>
+<!--      <v-container fluid>-->
+<!--        <p>{{ user.bio }} </p>-->
+<!--        <v-textarea-->
+<!--          v-model="bio"-->
+<!--          @input="$emit('input', $event.target.value)"-->
+<!--          label="Bio"-->
+<!--          persistent-hint = 'true'-->
+<!--          @change="updateBio"-->
+<!--          ref="bio"-->
+<!--          counter-->
+<!--          maxlength="120"-->
+<!--          full-width-->
+<!--          single-line-->
+<!--      > </v-textarea>-->
+<!--      </v-container>-->
 
-      <p class="profile__poste"> {{ user.poste }} </p>
+      <v-textarea
+          v-model="form.bio"
+          @input="$emit('input', $event.target.value)"
+          @change="updateBio"
+          color="teal"
+      >
 
-      <p class="profile__bio"> {{ user.bio }} </p>
-
-
+        <template v-slot:label>
+          <div>
+            Bio <small>(optional)</small><br/>
+          </div>
+        </template>
+      </v-textarea>
 
     </div>
 
@@ -89,11 +124,12 @@ import UpdateInfoUser from "@/components/UpdateInfoUser";
 export default {
   name: "Profile",
   components: {UpdateInfoUser},
-  beforeMount: function() {
+  beforeMount: function () {
     if (this.$store.state.user.uuidUser == "-1") {
       this.$router.push("/")
       return;
     }
+
     const uuidUser = this.$store.state.user.uuidUser
     this.$store.dispatch('getUserInfos', uuidUser)
   },
@@ -103,10 +139,17 @@ export default {
   },
 
   data() {
+    console.log(this.$data)
+    const defaultForm = Object.freeze({
+      bio:"La bio de l'user ici"
+    })
     return {
+      form: Object.assign({}, defaultForm),
       imageUrl: "",
       image: null,
-      profileCreatedAt: ""
+      profileCreatedAt: "",
+      poste: '',
+      bio:''
     }
   },
 
@@ -162,8 +205,49 @@ export default {
     },
 
     //Modifier les information utilisateur
-    updateProfile: function () {
+    updateBio:function (e){
+      console.log(e.target.value)
+
+      const updateBio = {
+        email: undefined,
+        firstName:undefined,
+        lastName:undefined,
+        bio: e.target.value,
+        poste:undefined
+      }
+
+      const payloadUpdateBio = {
+        uuidUser: this.$store.state.user.uuidUser,
+        updateBio
+      }
+      this.bio = e.target.value
+      this.$store.dispatch('updateUserBio', payloadUpdateBio)
     },
+
+    updatePoste:function (e){
+      console.log(e.target.value)
+
+      this.bio = e.target.value
+
+      const updatePoste = {
+        email: undefined,
+        firstName:undefined,
+        lastName:undefined,
+        bio: undefined,
+        poste: e.target.value
+      }
+
+
+      const payloadUpdatePoste = {
+        uuidUser: this.$store.state.user.uuidUser,
+        updatePoste
+      }
+
+      this.poste = e.target.value
+      this.$store.dispatch('updateUserPoste', payloadUpdatePoste)
+
+    },
+
   },
 
   computed: {
@@ -171,7 +255,9 @@ export default {
       user: "userInfos",
       //temps passé depuis la création du profile en jour !
       createdAt: "createdAt",
-      picture: "pictureProfile"
+      picture: "pictureProfile",
+      bio: "bio",
+      poste:"poste"
     }),
   }
 }
@@ -224,6 +310,25 @@ export default {
 
     .button {
       margin: 15px 0;
+    }
+  }
+
+  .profile {
+
+    &__temps > span {
+      font-weight: bold;
+    }
+
+    &__poste {
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      background: #f2f2f2;
+      font-weight: 500;
+      font-size: 16px;
+      flex: 1;
+      min-width: 100px;
+      color: black;
     }
   }
 }
