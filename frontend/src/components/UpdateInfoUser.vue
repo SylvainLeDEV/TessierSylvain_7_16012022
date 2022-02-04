@@ -22,7 +22,7 @@
                      md="4">
                 <v-text-field
                     label="Prénom"
-                    v-model="dataUserForInfos.firstName"
+                    v-model="firstName"
                     required
                 ></v-text-field>
               </v-col>
@@ -33,7 +33,7 @@
               >
                 <v-text-field
                     label="Nom"
-                    v-model="dataUserForInfos.lastName"
+                    v-model="lastName"
                     hint="example of helper text only on focus"
                 ></v-text-field>
               </v-col>
@@ -41,7 +41,7 @@
               <v-col cols="12">
                 <v-text-field
                     label="Email"
-                    v-model="dataUserForInfos.email"
+                    v-model="email"
                     error-messages="Email non valide"
                     :rules="[errorFunc]"
                     required
@@ -84,6 +84,9 @@ export default {
 
   data: () => ({
     dialog: false,
+    firstNameUpdate: "",
+    lastNameUpdate: "",
+    emailUpdate: "",
   }),
 
   methods: {
@@ -107,13 +110,24 @@ export default {
       const updateInfosUser = {
         email: this.email,
         firstName:this.firstName,
-        lastName:this.lastName
+        lastName:this.lastName,
+        bio: undefined,
+        poste:undefined
       }
-      console.log(updateInfosUser)
+      // const formData = new FormData()
+      // formData.append('profile', null)
+      const payloadUserInfos = {
+        uuidUser: this.$store.state.user.uuidUser,
+        dataUser : updateInfosUser,
+      }
+
+      console.log(payloadUserInfos)
+
+      this.$store.dispatch('updateUserInfos', payloadUserInfos)
 
       console.log(this.firstName, this.lastName, this.email)
 
-      // this.dialog = false
+      this.dialog = false
     },
   },
 

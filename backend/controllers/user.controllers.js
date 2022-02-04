@@ -76,11 +76,8 @@ module.exports.updateUser = async (req, res, next) => {
             //         message: 'Unauthorized request',
             //     })
             // }
-            if (req.files.profile) {
-
-                console.log(user.picture)
+            if ( req.files && req.files.profile) {
                 const filename = user.picture.split('/images/profile/')[1];
-                console.log(filename)
                 fs.unlink(`images/profile/${filename}`, () => {
                     const profileObject = {
                         firstName,
@@ -101,13 +98,8 @@ module.exports.updateUser = async (req, res, next) => {
                         })
                 })
             } else {
-
                 const profileObject = {
-                    firstName,
-                    lastName,
-                    email,
-                    poste,
-                    bio,
+                    firstName, lastName, email, poste, bio
                 }
                 user.update(profileObject, {
                     where: req.params.uuid
@@ -120,7 +112,7 @@ module.exports.updateUser = async (req, res, next) => {
             }
         })
         .catch((err) => {
-            return res.status(500).json({message: "Profile picture error" ,err: err})
+            return res.status(500).json({message: "Error update user" ,err: err})
         })
 }
 
