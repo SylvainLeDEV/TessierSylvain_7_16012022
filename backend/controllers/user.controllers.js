@@ -38,12 +38,12 @@ module.exports.deleteUser = (req, res, next) => {
     })
         .then((user) => {
 
-            // console.log("CONTROLE : ", user.uuid, req.auth.uuidUserToken)
-            // if (user.uuid !== req.auth.uuidUserToken) {
-            //     return res.status(400).json({
-            //         message: 'Unauthorized request',
-            //     })
-            // }
+            console.log("CONTROLE : ", user.uuid, req.auth.uuidUserToken)
+            if (user.uuid !== req.auth.uuidUserToken) {
+                return res.status(400).json({
+                    message: 'Unauthorized request',
+                })
+            }
 
             const filename = user.picture.split('/images/profile/')[1];
             fs.unlink(`images/profile/${filename}`, () => {
@@ -71,11 +71,12 @@ module.exports.updateUser = async (req, res, next) => {
                 })
             }
 
-            // if (user.uuid !== req.auth.uuidUserToken) {
-            //     return res.status(400).json({
-            //         message: 'Unauthorized request',
-            //     })
-            // }
+            if (user.uuid !== req.auth.uuidUserToken) {
+                return res.status(400).json({
+                    message: 'Unauthorized request',
+                })
+            }
+
             if ( req.files && req.files.profile) {
                 const filename = user.picture.split('/images/profile/')[1];
                 fs.unlink(`images/profile/${filename}`, () => {

@@ -10,7 +10,7 @@
           Modifier ces informations
         </button>
       </template>
-      <v-card class="card">
+      <v-card>
         <v-card-title>
           <span class="text-h5">Modifier vos informations</span>
         </v-card-title>
@@ -91,20 +91,6 @@ export default {
 
   methods: {
 
-    isChampsOk: function () {
-
-      if (this.email !== "") {
-        return true
-      } else {
-        return false
-      }
-
-
-    },
-    errorFunc:function (){
-        return "true"
-
-    },
     getInfosUser: function () {
 
       const updateInfosUser = {
@@ -114,8 +100,7 @@ export default {
         bio: undefined,
         poste:undefined
       }
-      // const formData = new FormData()
-      // formData.append('profile', null)
+
       const payloadUserInfos = {
         uuidUser: this.$store.state.user.uuidUser,
         dataUser : updateInfosUser,
@@ -135,7 +120,6 @@ export default {
     ...mapState({
       user: "userInfos",
       dataUserForInfos : 'dataUserForInfos',
-      picture: "pictureProfile",
     }),
   }
 
@@ -147,8 +131,8 @@ export default {
 
 
 .v-dialog .v-overlay__content > .v-card, .v-dialog .v-overlay__content > .v-sheet {
-  overflow: auto;
-  max-height: 78vh;
+  overflow-y: auto;
+  max-height: 90vh;
   transform: translateY(-20%);
 }
 
