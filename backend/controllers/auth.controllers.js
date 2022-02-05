@@ -19,7 +19,7 @@ module.exports.signUp = (req, res) => {
                 lastName: req.body.lastName,
                 poste: req.body.poste,
                 isAdmin: req.body.isAdmin,
-                picture : `${req.protocol}://${req.get('host')}/images/profile/pictureProfile/firstProfile.png`,
+                picture : `${req.protocol}://${req.get('host')}/images/pictureProfile/firstProfile.png`,
                 password: hash
             })
                 .then((user) => {
@@ -59,6 +59,29 @@ exports.login = (req, res, next) => {
                             {expiresIn: "1h"}
                         )
                     })
+                })
+                .catch(error => res.status(500).json({error: error}))
+
+        })
+        .catch(error => res.status(500).json({error: error}))
+
+};
+
+exports.loginForDelete = (req, res, next) => {
+    User.findOne({where: {email: req.body.email}})
+        .then(user => {
+            console.log(user)
+            if (!user) {
+                return res.status(401).json({message: 'Utilisateur non trouvé ! '})
+            }
+
+            bcrypt.compare(req.body.password, user.password)
+                .then(valid => {
+                    console.log(valid)
+                    if (!valid) {
+                        return res.status(401).json({message: 'Mot de passe incorrect! '})
+                    }
+                    return res.status(200).json({message: "User OK et pret pour etre delete"})
                 })
                 .catch(error => res.status(500).json({error: error}))
 

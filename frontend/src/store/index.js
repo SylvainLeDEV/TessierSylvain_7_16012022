@@ -40,7 +40,8 @@ export default createStore({
         createdAt:{
             createdAt:"",
             temps :""
-        }
+        },
+        deleteUser : null
     },
     getters :{
         getUser: function (state) {
@@ -63,7 +64,7 @@ export default createStore({
             state.userInfos = userInfos;
 
             const dateCreatProfile = new Date(userInfos.createdAt)
-            const calculDepuisLaCreation = dateCreatProfile - Date.now()
+            const calculDepuisLaCreation = dateCreatProfile + Date.now()
             let tempsDepuisLaCreation = new Date(calculDepuisLaCreation)
             let dateLocale = dateCreatProfile.toLocaleString('fr-FR',{
                 weekday: 'long',
@@ -91,13 +92,19 @@ export default createStore({
         updatePictureProfile: function (state, updatePictureProfile) {
             state.pictureProfile = updatePictureProfile
         },
+
         updateUserPoste: function (state, updateUserPoste) {
             state.poste = updateUserPoste
         },
+
         updateUserBio: function (state, updateUserBio) {
             state.bio = updateUserBio
-        }
+            console.log("updatebio",updateUserBio)
+        },
 
+        deleteUser : function (state, deleteUser){
+            state.deleteUser = deleteUser
+        }
     },
     actions: {
         createAccount: ({commit}, userInfo) => {
@@ -206,9 +213,8 @@ export default createStore({
                     commit('updateUserBio', response.data.profileObject.bio)
                     console.log(response)
                 })
-                .catch((err) => {
+                .catch(() => {
                     commit("setStatus",'update_bio_error' )
-                    console.log(err)
                 })
         },
 
@@ -231,6 +237,34 @@ export default createStore({
                     console.log(err)
                 })
         },
+
+        // deleteUser:({ commit} , payloadDeleteUser) => {
+        //     instance.post('/login', {
+        //         email: payloadDeleteUser.email,
+        //         password: payloadDeleteUser.password
+        //     })
+        //         .then((response) => {
+        //             commit('setStatus', 'user_ok')
+        //             console.log(response)
+        //
+        //             instance.delete('/' + payloadDeleteUser.uuidUser)
+        //                 .then((response) => {
+        //                     commit('deleteUser', true)
+        //                     this.$router.push('/')
+        //                     console.log(response)
+        //                 })
+        //                 .catch((err) => {
+        //                     commit('deleteUser', false)
+        //                     console.log(err)
+        //                 })
+        //
+        //         })
+        //         .catch((error) => {
+        //             commit('setStatus', 'error_password')
+        //             console.log(error)
+        //         });
+        // },
+
 
 
     },

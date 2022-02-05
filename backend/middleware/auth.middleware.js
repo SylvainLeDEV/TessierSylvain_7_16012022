@@ -5,6 +5,7 @@ const dotenv = require('dotenv').config({path: './config/.env', encoding: "latin
 module.exports = (req, res, next) => {
     try {
     // .split(' ')[1]
+
         const token = req.headers.authorization;
         const decodedToken = jsonwebtoken.decode(token, process.env.TOKEN_KEY);
         const uuidUserToken = decodedToken.uuidUser;

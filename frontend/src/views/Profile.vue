@@ -3,6 +3,7 @@
   <div class="card">
 
     <h1 class="card__title">{{ user.firstName }}, {{ user.lastName }} </h1>
+<!--    <h1 class="card__title" v-else>{{ user.firstName }}, {{ user.lastName }} </h1>-->
     <p class="card__subtitle">Voilà donc qui je suis...</p>
 
     <!--// L'image de PROFILE-->
@@ -53,24 +54,9 @@
           <option value="Designer">Designer</option>
         </select>
       </div>
-<!--      <v-container fluid>-->
-<!--        <p>{{ user.bio }} </p>-->
-<!--        <v-textarea-->
-<!--          v-model="bio"-->
-<!--          @input="$emit('input', $event.target.value)"-->
-<!--          label="Bio"-->
-<!--          persistent-hint = 'true'-->
-<!--          @change="updateBio"-->
-<!--          ref="bio"-->
-<!--          counter-->
-<!--          maxlength="120"-->
-<!--          full-width-->
-<!--          single-line-->
-<!--      > </v-textarea>-->
-<!--      </v-container>-->
 
       <v-textarea
-          v-model="form.bio"
+          v-model="bioValue"
           @input="$emit('input', $event.target.value)"
           @change="updateBio"
           color="teal"
@@ -95,7 +81,7 @@
       </button>
     </div>
 
-    <button @click="deleteProfile" color="red" class="button">
+    <button @click="deleteProfile" class="button button__deleteUser">
       Supprimer le profile (Définitif)
     </button>
 
@@ -104,7 +90,7 @@
       <div v-if="post == null">
         <p> L'utilisateur n'as pas fait de posts </p>
       </div>
-      <div class="posts__posts-name">
+      <div v-else class="posts__posts-name">
         <p>{{ post.userName }}</p>
         <div class="posts__content">
           <p>{{ post.content }}</p>
@@ -120,6 +106,11 @@
 <script>
 import {mapState} from 'vuex'
 import UpdateInfoUser from "@/components/UpdateInfoUser";
+import axios from "axios";
+
+const instance = axios.create({
+  baseURL: 'http://localhost:3000/api/user/',
+});
 
 export default {
   name: "Profile",
@@ -139,9 +130,8 @@ export default {
   },
 
   data() {
-    console.log(this.$data)
     const defaultForm = Object.freeze({
-      bio:"La bio de l'user ici"
+      bio: ''
     })
     return {
       form: Object.assign({}, defaultForm),
@@ -149,7 +139,10 @@ export default {
       image: null,
       profileCreatedAt: "",
       poste: '',
-      bio:''
+      bio: '',
+      firstName:"",
+      lastName:"",
+      email:"",
     }
   },
 
@@ -205,15 +198,13 @@ export default {
     },
 
     //Modifier les information utilisateur
-    updateBio:function (e){
-      console.log(e.target.value)
-
+    updateBio: function (e) {
       const updateBio = {
         email: undefined,
-        firstName:undefined,
-        lastName:undefined,
+        firstName: undefined,
+        lastName: undefined,
         bio: e.target.value,
-        poste:undefined
+        poste: undefined
       }
 
       const payloadUpdateBio = {
@@ -224,15 +215,11 @@ export default {
       this.$store.dispatch('updateUserBio', payloadUpdateBio)
     },
 
-    updatePoste:function (e){
-      console.log(e.target.value)
-
-      this.bio = e.target.value
-
+    updatePoste: function (e) {
       const updatePoste = {
         email: undefined,
-        firstName:undefined,
-        lastName:undefined,
+        firstName: undefined,
+        lastName: undefined,
         bio: undefined,
         poste: e.target.value
       }
@@ -248,16 +235,68 @@ export default {
 
     },
 
+    deleteProfile:function (){
+
+      let valeurPassword = prompt('Renseigner votre mot de passe pour valider')
+
+      const payloadDeleteUser = {
+        uuidUser: this.$store.state.user.uuidUser,
+        email:this.$store.state.userInfos.email,
+        password: valeurPassword,
+      }
+      console.log("ici", payloadDeleteUser)
+      // this.$store.dispatch('deleteUser', payloadDeleteUser)
+
+
+
+
+      instance.post('/loginForDelete', {
+        email: payloadDeleteUser.email,
+        password: payloadDeleteUser.password
+      })
+          .then((response) => {
+            console.log("double ici", response)
+            this.$router.push('/')
+            instance.delete('/' + payloadDeleteUser.uuidUser)
+                .then((response) => {
+                  this.$router.push('/')
+                  console.log(response)
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
+
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+
+
+    }
+
   },
 
   computed: {
+
+    bioValue() {
+      if (this.bio !== "") {
+        return this.bio
+      } else {
+        return this.$store.state.bio
+      }
+    },
     ...mapState({
       user: "userInfos",
       //temps passé depuis la création du profile en jour !
       createdAt: "createdAt",
       picture: "pictureProfile",
       bio: "bio",
-      poste:"poste"
+      poste: "poste",
+      dataUserForInfos:{
+        firstNameUpdate: "firstName",
+        lastNameUpdate:"lastName",
+        emailUpdate:"email"
+      }
     }),
   }
 }
@@ -330,6 +369,9 @@ export default {
       min-width: 100px;
       color: black;
     }
+  }
+  .button__deleteUser{
+    background: #CF6679;
   }
 }
 
