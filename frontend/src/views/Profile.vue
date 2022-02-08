@@ -41,7 +41,7 @@
       <p class="profile__email"> Email : {{ user.email }}</p>
 
       <p class="profile__creatAt"> Nous a rejoints le : {{ createdAt.createdAt }} </p>
-      <p class="profile__temps"> ça fait <span> {{ createdAt.temps }} jours </span> que tu es parmi nous en tant que :
+      <p class="profile__temps"> ça fait <span> {{ tempsParmiNous }} jours </span> que tu es parmi nous en tant que :
       </p>
       <div>
         <select v-model="poste" name="poste" id="poste" @change="updatePoste" ref="poste" class="profile__poste">
@@ -106,11 +106,6 @@
 <script>
 import {mapState} from 'vuex'
 import UpdateInfoUser from "@/components/UpdateInfoUser";
-import axios from "axios";
-
-const instance = axios.create({
-  baseURL: 'http://localhost:3000/api/user/',
-});
 
 export default {
   name: "Profile",
@@ -235,48 +230,46 @@ export default {
 
     },
 
-    deleteProfile:function (){
+    deleteProfile: function (){
 
       let valeurPassword = prompt('Renseigner votre mot de passe pour valider')
+
 
       const payloadDeleteUser = {
         uuidUser: this.$store.state.user.uuidUser,
         email:this.$store.state.userInfos.email,
         password: valeurPassword,
       }
-      console.log("ici", payloadDeleteUser)
-      // this.$store.dispatch('deleteUser', payloadDeleteUser)
 
-
-
-
-      instance.post('/loginForDelete', {
-        email: payloadDeleteUser.email,
-        password: payloadDeleteUser.password
-      })
-          .then((response) => {
-            console.log("double ici", response)
-            this.$router.push('/')
-            instance.delete('/' + payloadDeleteUser.uuidUser)
-                .then((response) => {
-                  this.$router.push('/')
-                  console.log(response)
-                })
-                .catch((err) => {
-                  console.log(err)
-                })
-
+      this.$store.dispatch('deleteUser', payloadDeleteUser)
+          .then(() => {
+            if(this.$store.state.status === "error_password"){
+              alert('Mon de passe incorrect')
+            } else if (this.$store.state.deleteUser === true) {
+              this.$store.commit('deleteUser')
+              this.$router.push("/")
+              alert("Profile supprimer")
+            } else {
+              alert('Utilisateur non trouvé')
+            }
           })
-          .catch((error) => {
-            console.log(error)
-          });
 
+
+      // console.log('test')
+      // this.$store.commit('deleteUser')
+      // this.$router.push("/")
 
     }
 
   },
 
   computed: {
+    tempsParmiNous(){
+      const creatAt = new Date(this.$store.state.createdAt.temps)
+      const dateNow = new Date()
+      const diffDate = new Date(dateNow.getTime()- creatAt.getTime())
+      return  diffDate.getUTCDate()
+    },
 
     bioValue() {
       if (this.bio !== "") {
@@ -296,7 +289,7 @@ export default {
         firstNameUpdate: "firstName",
         lastNameUpdate:"lastName",
         emailUpdate:"email"
-      }
+      },
     }),
   }
 }
