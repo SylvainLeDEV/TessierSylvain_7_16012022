@@ -8,6 +8,7 @@ const fs = require("fs");
 module.exports.readPost = (req, res, next) => {
     Posts.findAll({include: [User, Comments]})
         .then((posts) => {
+            console.log(posts)
             const post = posts.sort(function (a, b) {
                 return b.createdAt - a.createdAt
             })
@@ -38,7 +39,9 @@ module.exports.createPost = async (req, res, next) => {
                         });
                     }
                 );
-        })
+        }).catch((err) => {
+            return res.status(400).json({err, message:'problème création post'})
+    })
 }
 
 module.exports.readOnePost = (req, res, next) => {

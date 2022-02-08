@@ -6,6 +6,10 @@ const instance = axios.create({
     baseURL: 'http://localhost:3000/api/user/',
 });
 
+const instancePosts = axios.create({
+    baseURL: 'http://localhost:3000/api/post/'
+})
+
 let user = localStorage.getItem('user')
 if (!user) {
     user = {
@@ -26,30 +30,34 @@ if (!user) {
 
 export default createStore({
     state: {
+        // Profiles USER
         status: [''],
         user: user,
         userInfos: {},
-        dataUserForInfos :{
-         firstName: "",
-         lastName:"",
-         email:"",
+        dataUserForInfos: {
+            firstName: "",
+            lastName: "",
+            email: "",
         },
         pictureProfile: '',
-        poste:'',
-        bio:'',
-        createdAt:{
-            createdAt:"",
-            temps :""
+        poste: '',
+        bio: '',
+        createdAt: {
+            createdAt: "",
+            temps: ""
         },
-        deleteUser : null
+        deleteUser: null
+        // POSTS
     },
-    getters :{
+    getters: {
         getUser: function (state) {
             return state.userInfos
         },
-    } ,
+    },
 
     mutations: {
+
+        //PROFILE USER
         setStatus: function (state, status) {
             state.status = status;
         },
@@ -64,15 +72,14 @@ export default createStore({
             state.userInfos = userInfos;
 
             const dateCreatProfile = new Date(userInfos.createdAt)
-            const calculDepuisLaCreation = dateCreatProfile + Date.now()
-            let tempsDepuisLaCreation = new Date(calculDepuisLaCreation)
-            let dateLocale = dateCreatProfile.toLocaleString('fr-FR',{
+            let dateLocale = dateCreatProfile.toLocaleString('fr-FR', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric'});
+                day: 'numeric'
+            });
 
-            state.createdAt.temps = tempsDepuisLaCreation.getDay()
+            state.createdAt.temps = dateCreatProfile
             state.createdAt.createdAt = dateLocale
             state.dataUserForInfos.firstName = userInfos.firstName
             state.dataUserForInfos.lastName = userInfos.lastName
@@ -99,14 +106,23 @@ export default createStore({
 
         updateUserBio: function (state, updateUserBio) {
             state.bio = updateUserBio
-            console.log("updatebio",updateUserBio)
+            console.log("updatebio", updateUserBio)
         },
 
-        deleteUser : function (state, deleteUser){
+        deleteUser: function (state, deleteUser) {
+            state.user = {
+                uuidUser: "-1",
+                token: "",
+            }
+            localStorage.removeItem('user')
             state.deleteUser = deleteUser
+            console.log(deleteUser)
         }
+
+        //POSTS
     },
     actions: {
+        //PROFILE
         createAccount: ({commit}, userInfo) => {
             commit("setStatus", "loading")
             return new Promise((resolve, reject) => {
@@ -152,7 +168,7 @@ export default createStore({
                 .then((response) => {
                     commit("userInfos", response.data)
                     commit("updatePictureProfile", response.data.picture)
-                    console.log(response)
+                    // console.log(response)
                 })
                 .catch((error) => {
                     commit("setStatus", "error_auth")
@@ -174,7 +190,7 @@ export default createStore({
                     console.log(response)
                 })
                 .catch((err) => {
-                    commit("setStatus",'userInfosUpdate_error' )
+                    commit("setStatus", 'userInfosUpdate_error')
                     console.log(err)
                 })
         },
@@ -214,7 +230,7 @@ export default createStore({
                     console.log(response)
                 })
                 .catch(() => {
-                    commit("setStatus",'update_bio_error' )
+                    commit("setStatus", 'update_bio_error')
                 })
         },
 
@@ -233,38 +249,49 @@ export default createStore({
                     console.log(response)
                 })
                 .catch((err) => {
-                    commit("setStatus",'update_poste_error' )
+                    commit("setStatus", 'update_poste_error')
                     console.log(err)
                 })
         },
 
-        // deleteUser:({ commit} , payloadDeleteUser) => {
-        //     instance.post('/login', {
-        //         email: payloadDeleteUser.email,
-        //         password: payloadDeleteUser.password
-        //     })
-        //         .then((response) => {
-        //             commit('setStatus', 'user_ok')
-        //             console.log(response)
-        //
-        //             instance.delete('/' + payloadDeleteUser.uuidUser)
-        //                 .then((response) => {
-        //                     commit('deleteUser', true)
-        //                     this.$router.push('/')
-        //                     console.log(response)
-        //                 })
-        //                 .catch((err) => {
-        //                     commit('deleteUser', false)
-        //                     console.log(err)
-        //                 })
-        //
-        //         })
-        //         .catch((error) => {
-        //             commit('setStatus', 'error_password')
-        //             console.log(error)
-        //         });
-        // },
+        deleteUser: ({commit}, payloadDeleteUser) => {
+            instance.post('/login', {
+                email: payloadDeleteUser.email,
+                password: payloadDeleteUser.password
+            })
+                .then((response) => {
+                    commit('setStatus', 'user_ok')
+                    console.log(response)
 
+                    instance.delete('/' + payloadDeleteUser.uuidUser)
+                        .then((response) => {
+                            commit('deleteUser', true)
+                            console.log(response)
+                        })
+                        .catch((err) => {
+                            commit('deleteUser', false)
+                            console.log(err)
+                        })
+
+                })
+                .catch((error) => {
+                    commit('setStatus', 'error_password')
+                    console.log(error)
+                });
+        },
+
+        //POSTS
+
+        getAllPosts: ({commit}) => {
+            commit("setStatus", "loading_posts")
+            instancePosts.get('/' )
+                .then((response) => {
+                    console.log(response)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
 
 
     },
