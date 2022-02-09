@@ -46,8 +46,10 @@ export default createStore({
             createdAt: "",
             temps: ""
         },
-        deleteUser: null
+        deleteUser: null,
         // POSTS
+        allPosts: []
+
     },
     getters: {
         getUser: function (state) {
@@ -117,9 +119,12 @@ export default createStore({
             localStorage.removeItem('user')
             state.deleteUser = deleteUser
             console.log(deleteUser)
-        }
+        },
 
         //POSTS
+        allPosts: function (state, allPosts){
+            state.allPosts = allPosts
+        }
     },
     actions: {
         //PROFILE
@@ -196,8 +201,6 @@ export default createStore({
         },
 
         updatePictureProfile: ({commit}, payload) => {
-            console.log(payload.picture)
-            console.log(payload.uuidUser)
             instance.put('/' + payload.uuidUser, payload.picture
                 , {
                     headers: {
@@ -286,14 +289,31 @@ export default createStore({
             commit("setStatus", "loading_posts")
             instancePosts.get('/' )
                 .then((response) => {
+                    commit('allPosts', response.data)
+                    console.log(response.data)
+                })
+                .catch((err) => {
+                    commit('setStatus', "no_posts")
+                    console.log(err)
+                })
+        },
+
+        addPost: ({commit}, payloadAddPost) => {
+            console.log(payloadAddPost)
+            commit("setStatus", "post_posted")
+            instancePosts.post('/', payloadAddPost,{
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+                .then((response)=> {
                     console.log(response)
                 })
                 .catch((err) => {
                     console.log(err)
                 })
-        }
-
-
+        },
     },
     modules: {}
 })
