@@ -6,7 +6,18 @@ const fs = require("fs");
 
 
 module.exports.readPost = (req, res, next) => {
-    Posts.findAll({include: [User, Comments]})
+    Posts.findAll({
+        include: [
+            {
+                model: User,
+                as: 'User'
+            },
+            {
+                model: Comments,
+                as: 'comment'
+            }
+        ]
+    })
         .then((posts) => {
             console.log(posts)
             const post = posts.sort(function (a, b) {
@@ -26,7 +37,7 @@ module.exports.createPost = async (req, res, next) => {
         .then((user) => {
             if (!user)
                 return res.status(401).json({message: "Utilisateur non trouvé !"})
-            Posts.create({content, imageUrl, videoUrl, userName:user.firstName ,userId: user.id})
+            Posts.create({content, imageUrl, videoUrl, userName: user.firstName, userId: user.id})
                 .then(() => {
                         res.status(201).json({
                             message: 'Post saved successfully!'
@@ -40,7 +51,7 @@ module.exports.createPost = async (req, res, next) => {
                     }
                 );
         }).catch((err) => {
-            return res.status(400).json({err, message:'problème création post'})
+        return res.status(400).json({err, message: 'problème création post'})
     })
 }
 
@@ -220,7 +231,15 @@ module.exports.createCommentPost = async (req, res, next) => {
                         return res.status(401).json({message: "Post non trouvé !"})
                     console.log(post)
 
-                    Comments.create({ userName: user.firstName,content, imageUrl, videoUrl, postId: post.id, posterId: posterId, userId: userId})
+                    Comments.create({
+                        userName: user.firstName,
+                        content,
+                        imageUrl,
+                        videoUrl,
+                        postId: post.id,
+                        posterId: posterId,
+                        userId: userId
+                    })
                         .then(() => {
                                 res.status(201).json({
                                     message: 'Comment saved successfully!'
@@ -301,7 +320,7 @@ module.exports.editCommentPost = (req, res, next) => {
                     videoUrl
                 }
                 comment.update(commentObject, {
-                    where :req.params.uuid
+                    where: req.params.uuid
                 }).then(() => {
                     return res.status(200).json({message: 'comment upDate'})
                 })
@@ -310,7 +329,7 @@ module.exports.editCommentPost = (req, res, next) => {
                     })
             }
         })
-        .catch((err) => res.status(500).json({ err ,message: "Probleme sur update commentaire"}))
+        .catch((err) => res.status(500).json({err, message: "Probleme sur update commentaire"}))
 }
 
 module.exports.deleteCommentPost = (req, res, next) => {
@@ -329,7 +348,8 @@ module.exports.deleteCommentPost = (req, res, next) => {
                 return res.status(401).json({message: "Pas de commentaire trovué ! "})
             }
             const filename = comment.imageUrl.split('/images/comment/')[1];
-            fs.unlink(`images/comment/${filename}`, () => {})
+            fs.unlink(`images/comment/${filename}`, () => {
+            })
 
             console.log(comment)
             comment.destroy()

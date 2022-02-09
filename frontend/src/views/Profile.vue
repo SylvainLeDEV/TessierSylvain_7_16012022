@@ -185,8 +185,8 @@ export default {
       const payload = {
         uuidUser: this.$store.state.user.uuidUser,
         picture: formData
-
       }
+      console.log(payload)
       this.$store.dispatch('updatePictureProfile', payload)
       this.image = null
       this.imageUrl = ""
