@@ -4,11 +4,11 @@
     <v-layout style="overflow: hidden">
       <v-app-bar
           absolute
-          color="deep-purple"
+          color="blue"
       >
         <v-app-bar-nav-icon v-if="$route.path !== '/'" @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-        <v-img class="groupomania" src="@/assets/Groupomania_logos/icon-left-font-monochrome-black.png"/>
+        <v-img class="groupomania" src="@/assets/Groupomania_logos/icon-left-font-monochrome-white.png"/>
       </v-app-bar>
       <v-navigation-drawer v-if="$route.path !== '/'"
                            v-model="drawer"
@@ -36,7 +36,6 @@
 <script>
 
 // import Loader from "@/components/Loader";
-
 export default {
   name: 'App',
   // components: {Loader},
@@ -98,12 +97,11 @@ export default {
 
 body {
   //background-image: linear-gradient(62deg, #FBAB7E 0%, #F7CE68 100%);
-  background: -webkit-gradient(linear, left top, left bottom, from(#9356DC), to(#FF79DA));
+  background: #e7e7e7;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 0 15px;
 }
 
 

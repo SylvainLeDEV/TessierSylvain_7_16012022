@@ -56,29 +56,31 @@
     <!---->
 
     <!--    container posts and comment-->
-    <main class="main" v-for="posts in allPosts" :key="posts.id">
-      <div class="post">
+    <main class="main" v-for="post in allPosts" :key="post.id">
+      <div class="post" v-if="renderComponent">
 
         <header class="post__header">
-          <img class="post__header-img" :src="posts.User.picture" alt="Image profile">
+          <img class="post__header-img" :src="post.User.picture" alt="Image profile">
           <div class="post__header-text">
-            <div class="post__header-pseudo"> {{ posts.User.firstName }}</div>
-            <div class="post__header-date"> {{ posts.createdAt }}</div>
+            <div class="post__header-pseudo"> {{ post.User.firstName }}</div>
+            <div class="post__header-date"> {{ post.createdAt }}</div>
           </div>
         </header>
 
         <div class="post__body">
-          <img class="post__body-img" v-if="posts.imageUrl !==''" :src="posts.imageUrl" alt="Image du post">
-          <p class="post__body-content">{{ posts.content }}</p>
+          <img class="post__body-img" v-if="post.imageUrl !==''" :src="post.imageUrl" alt="Image du post">
+          <p class="post__body-content">{{ post.content }}</p>
         </div>
 
         <div class="post__footer">
           <v-btn
+              v-if="post.buttonDelete"
               class="post__footer-btn-delete"
               color="error"
               depressed
               icon
               size="small"
+              @click="deletePost(post)"
           >
             <v-icon>mdi-delete outline</v-icon>
           </v-btn>
@@ -100,7 +102,7 @@
               <v-icon>mdi-comment processing outline</v-icon>
             </v-btn>
             <p class="post__footer-btn-comment-p">
-              {{ posts.comment.length }}
+              {{ post.comment.length }}
             </p>
           </div>
         </div>
@@ -119,19 +121,31 @@ export default {
 
   name: 'Posts',
 
+  data() {
+    return {
+      contentPost: '',
+      image: null,
+      imageUrl: "",
+      renderComponent: true,
+    }
+  },
+
   mounted: function () {
     this.$store.dispatch('getAllPosts')
 
   },
 
-  data() {
-    return {
-      contentPost:'',
-      image: null,
-      imageUrl: "",
-    }
-  },
   methods: {
+    forceRerender() {
+      this.$store.dispatch('getAllPosts')
+          .then(() => {
+            this.renderComponent = false;
+          })
+          .then(() => {
+            this.$nextTick()
+            this.renderComponent = true;
+          });
+    },
     addPictureOnPosts: function () {
       this.$refs.fileInputPosts.click();
     },
@@ -140,7 +154,6 @@ export default {
       const files = eventChange[0]
       const sizeFile = files.size
       const fileName = files.name
-      console.log(files)
 
       if (sizeFile > 5 * 1024 * 1024) {
         event.preventDefault();
@@ -163,23 +176,49 @@ export default {
       const user = localStorage.getItem('user')
       const uuidUser = JSON.parse(user)
 
-      const formData = new FormData()
-      formData.append('posts', this.image)
+      if (this.image !== null) {
+        console.log(" ou LA")
+        const formData = new FormData()
+        formData.append('posts', this.image);
+        formData.append('content', this.contentPost);
+        formData.append('userUuid', uuidUser.uuidUser);
 
-      const payloadAddPost ={
-        imageUrl: formData,
-        content: this.contentPost,
-        userUuid : uuidUser.uuidUser
+        const payloadAddPost = formData;
+        this.$store.dispatch('addPost', payloadAddPost)
+            .then(() => {
+              this.$store.dispatch('getAllPosts')
+            });
+
+      } else if (this.contentPost === '') {
+        alert("Ecris ton meilleur post !! ")
+      } else {
+        console.log("ICI")
+        const payloadAddPost = {
+          imageUrl: null,
+          content: this.contentPost,
+          userUuid: uuidUser.uuidUser
+        };
+        this.$store.dispatch('addPost', payloadAddPost)
+            .then(() => {
+              this.forceRerender()
+            })
       }
-
-
-      this.$store.dispatch('addPost',payloadAddPost)
-
+      this.contentPost = ''
       this.image = null
       this.imageUrl = ''
     },
 
+    deletePost: function (post) {
 
+      console.log(post)
+      const payloadDeletePost = {uuid: post.uuid}
+
+      this.$store.dispatch('deletePost', payloadDeletePost)
+          .then(() => {
+            this.$store.dispatch('getAllPosts')
+          })
+
+    },
   },
   computed: {
 
@@ -187,7 +226,6 @@ export default {
       allPosts: 'allPosts'
     })
   },
-
 }
 
 </script>
@@ -213,7 +251,7 @@ export default {
     }
 
     &-text {
-      padding-left:10px ;
+      padding-left: 10px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -221,27 +259,31 @@ export default {
 
   }
 
-  &__body{
+  &__body {
 
-    &-img{
-     width: 100%;
+    &-img {
+      width: 100%;
       height: 300px;
       object-fit: cover;
     }
-    &-content{
+
+    &-content {
       margin-left: -5px;
       margin-right: -5px;
       margin-bottom: 5px;
     }
   }
-  &__footer{
-   display: flex;
+
+  &__footer {
+    display: flex;
     justify-content: space-between;
     padding: 10px 10px;
+
     &-btn-comment {
       position: relative;
     }
-    &-btn-comment > p{
+
+    &-btn-comment > p {
       position: absolute;
       top: 25px;
       left: 25px;

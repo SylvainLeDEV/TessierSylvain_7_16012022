@@ -16,6 +16,7 @@ const types = Object.keys(MIME_TYPES)
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
+        console.log("log MULTER :" ,req, file)
         if (types.includes(file.mimetype)) {
             if (file.fieldname === "posts") {
                 callback(null, 'images/posts');
