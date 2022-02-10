@@ -7,6 +7,7 @@ module.exports = (req, res, next) => {
     // .split(' ')[1]
 
         const token = req.headers.authorization;
+        console.log(token)
         const decodedToken = jsonwebtoken.decode(token, process.env.TOKEN_KEY);
         const uuidUserToken = decodedToken.uuidUser;
         const isAdminToken = decodedToken.isAdmin;

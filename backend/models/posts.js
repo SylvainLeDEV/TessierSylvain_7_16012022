@@ -60,11 +60,13 @@ module.exports = (sequelize, DataTypes) => {
   });
   Posts.beforeDestroy(async (Posts) => {
     console.log('ici')
+    if (Posts.imageUrl){
       const filename = Posts.imageUrl.split('/images/posts')[1];
     console.log("filename", filename)
       fs.unlink(`images/posts/${filename}`,(res) =>{
         console.log(res)
       })
+    }
   })
   return Posts;
 };

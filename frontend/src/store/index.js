@@ -20,6 +20,7 @@ if (!user) {
     try {
         user = JSON.parse(user)
         instance.defaults.headers.common['Authorization'] = user.token;
+        instancePosts.defaults.headers.common['Authorization'] = user.token;
     } catch (ex) {
         user = {
             uuidUser: "-1",
@@ -289,6 +290,18 @@ export default createStore({
             commit("setStatus", "loading_posts")
             instancePosts.get('/' )
                 .then((response) => {
+                    const user = localStorage.getItem('user')
+                    const uuidUser = JSON.parse(user)
+
+                    response.data.forEach((post) => {
+                        if (uuidUser.uuidUser === post.User.uuid) {
+
+                            post.buttonDelete =  true
+                        } else {
+
+                            post.buttonDelete =  false
+                        }
+                    })
                     commit('allPosts', response.data)
                     console.log(response.data)
                 })
@@ -299,16 +312,28 @@ export default createStore({
         },
 
         addPost: ({commit}, payloadAddPost) => {
-            console.log(payloadAddPost)
-            commit("setStatus", "post_posted")
-            instancePosts.post('/', payloadAddPost,{
+            console.log("log Payloade dans addPost : ",payloadAddPost)
+            commit("setStatus", "addpost_ok")
+            instancePosts.post('/createpost', payloadAddPost ,{
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'multipart/form-data'
+                    'Accept': '*/*',
+                    'Content-Type': 'application/json; charset=utf-8'
                 }
             })
                 .then((response)=> {
-                    console.log(response)
+                    console.log("response addPost :",response)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        },
+
+        deletePost: ({commit}, payloadDeletePost) =>{
+            console.log("log Payloade dans addPost : ",payloadDeletePost)
+            commit("setStatus", "post_posted")
+            instancePosts.delete('/' + payloadDeletePost.uuid )
+                .then((response)=> {
+                    console.log("Post delete :",response)
                 })
                 .catch((err) => {
                     console.log(err)

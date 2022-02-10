@@ -19,7 +19,6 @@ module.exports.readPost = (req, res, next) => {
         ]
     })
         .then((posts) => {
-            console.log(posts)
             const post = posts.sort(function (a, b) {
                 return b.createdAt - a.createdAt
             })
@@ -32,7 +31,10 @@ module.exports.readPost = (req, res, next) => {
 
 module.exports.createPost = async (req, res, next) => {
     const {content, videoUrl, userUuid} = req.body
-    const imageUrl = `${req.protocol}://${req.get('host')}/images/posts/${req.files.posts[0].filename}`
+    let imageUrl = null
+    if (req.files) {
+        imageUrl = `${req.protocol}://${req.get('host')}/images/posts/${req.files.posts[0].filename}`
+    }
     User.findOne({where: {uuid: userUuid}})
         .then((user) => {
             if (!user)
@@ -40,7 +42,8 @@ module.exports.createPost = async (req, res, next) => {
             Posts.create({content, imageUrl, videoUrl, userName: user.firstName, userId: user.id})
                 .then(() => {
                         res.status(201).json({
-                            message: 'Post saved successfully!'
+                            message: 'Post saved successfully!',
+
                         });
                     }
                 )
@@ -134,7 +137,16 @@ module.exports.deletePost = (req, res, next) => {
     // METTRE EN PLACE le isAdmin
     const uuidPost = req.params.uuid
     Posts.findOne({
-        where: {uuid: uuidPost}, include: [User, Comments]
+        where: {uuid: uuidPost}, include: [
+            {
+                model: User,
+                as: 'User'
+            },
+            {
+                model: Comments,
+                as: 'comment'
+            }
+        ]
     })
         .then((post) => {
             if (!post) {
@@ -145,9 +157,12 @@ module.exports.deletePost = (req, res, next) => {
                     message: 'Unauthorized request',
                 })
             }
-            const filename = post.imageUrl.split('/images/posts')[1];
-            fs.unlink(`images/posts/${filename}`, {})
+            // console.log("delete image", post.imageUrl)
+            // const filename = post.imageUrl.split('/images/posts')[1];
+            // fs.unlink(`images/posts/${filename}`, () => {
+            // })
             post.destroy()
+
             return res.status(200).json({message: 'Post destroy'})
         })
         .catch((err) => {

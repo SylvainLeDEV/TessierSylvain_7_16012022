@@ -81,7 +81,7 @@ export default {
 
   mounted: function () {
     if (this.$store.state.user.uuidUser !== "-1") {
-      this.$router.push("/profile/")
+      this.$router.push("/posts/")
       return;
     }
   },
@@ -118,7 +118,7 @@ export default {
         email: this.email,
         password: this.password
       }).then(() => {
-        this.$router.push("/profile")
+        this.$router.push("/posts")
       }).catch((error) => {
         console.log(error)
       })
