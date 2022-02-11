@@ -26,6 +26,7 @@
         <v-card
             class="mx-auto overflow-auto"
             height="100vh" >
+
           <router-view/>
         </v-card>
       </v-main>

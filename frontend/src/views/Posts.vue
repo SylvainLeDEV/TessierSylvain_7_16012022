@@ -7,7 +7,7 @@
           color="blue-grey"
           dark
       >
-        <v-toolbar-title>Submit a post</v-toolbar-title>
+        <v-toolbar-title>Comment vas tu aujourd'hui ?</v-toolbar-title>
       </v-toolbar>
 
       <v-card-text>
@@ -47,6 +47,7 @@
         <v-btn
             color="success"
             depressed
+            :key="renderComponent"
             @click="addPost"
         >
           Post
@@ -56,19 +57,35 @@
     <!---->
 
     <!--    container posts and comment-->
-    <main class="main" v-for="post in allPosts" :key="post.id">
-      <div class="post" v-if="renderComponent">
+    <main class="main" v-if="renderComponent">
+      <div class="post" v-for="post in allPosts" :key="post.id">
 
         <header class="post__header">
           <img class="post__header-img" :src="post.User.picture" alt="Image profile">
           <div class="post__header-text">
-            <div class="post__header-pseudo"> {{ post.User.firstName }}</div>
+            <router-link :to="{ name: 'Profile'}" @click="getUserProfile">
+              <div class="post__header-pseudo"> {{ post.User.firstName }}</div>
+            </router-link>
             <div class="post__header-date"> {{ post.createdAt }}</div>
           </div>
         </header>
 
         <div class="post__body">
-          <img class="post__body-img" v-if="post.imageUrl !==''" :src="post.imageUrl" alt="Image du post">
+          <img class="post__body-img" v-if="post.imageUrl !== null " :src="post.imageUrl" alt="Image du post">
+          <div  v-if="updatePostTextArea[post.id]"  >
+          <textarea v-model="postUpdate" >
+          </textarea>
+            <v-btn
+                color="success"
+                icon
+                depressed
+                size="small"
+                @click="updatePost(post)"
+            >
+              <v-icon>mdi-check or done</v-icon>
+            </v-btn>
+          </div>
+
           <p class="post__body-content">{{ post.content }}</p>
         </div>
 
@@ -85,11 +102,13 @@
             <v-icon>mdi-delete outline</v-icon>
           </v-btn>
           <v-btn
+              v-if="post.buttonModify"
               class="post__footer-btn-modify"
               color="success"
               icon
               depressed
               size="small"
+              @click="updatePost($event ,post)"
           >
             <v-icon>mdi-pencil outline</v-icon>
           </v-btn>
@@ -127,6 +146,9 @@ export default {
       image: null,
       imageUrl: "",
       renderComponent: true,
+      updatePostTextArea: [],
+      postUpdate : [],
+
     }
   },
 
@@ -139,12 +161,13 @@ export default {
     forceRerender() {
       this.$store.dispatch('getAllPosts')
           .then(() => {
-            this.renderComponent = false;
+            this.renderComponent = false
           })
           .then(() => {
-            this.$nextTick()
-            this.renderComponent = true;
-          });
+            this.$nextTick(() => {
+            })
+            this.renderComponent = true
+          })
     },
     addPictureOnPosts: function () {
       this.$refs.fileInputPosts.click();
@@ -200,7 +223,9 @@ export default {
         };
         this.$store.dispatch('addPost', payloadAddPost)
             .then(() => {
-              this.forceRerender()
+              setTimeout(() => {
+                this.forceRerender()
+              }, 100)
             })
       }
       this.contentPost = ''
@@ -215,16 +240,36 @@ export default {
 
       this.$store.dispatch('deletePost', payloadDeletePost)
           .then(() => {
-            this.$store.dispatch('getAllPosts')
+            setTimeout(() => {
+              this.forceRerender()
+            }, 100)
           })
+
+    },
+
+    updatePost: function (event, post) {
+
+      console.log(this.postUpdate)
+      this.updatePostTextArea[post.id] = !this.updatePostTextArea[post.id]
+
+      // const pauloadDeletePost = {
+      //   uuid: post.uuid
+      //
+      // }
 
     },
   },
   computed: {
 
     ...mapState({
-      allPosts: 'allPosts'
-    })
+      allPosts: 'allPosts',
+      userInfos: 'userInfos'
+    }),
+
+    allPosts() {
+      return this.$store.getters.getAllPosts
+    }
+
   },
 }
 
