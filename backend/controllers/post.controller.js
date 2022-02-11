@@ -83,7 +83,8 @@ module.exports.updatePost = (req, res, next) => {
     const {content, videoUrl} = req.body
     Posts.findOne({where: {uuid: uuidPost}})
         .then((post) => {
-            const filename = post.imageUrl.split('/images/posts')[1];
+
+            console.log("ici")
             if (!post) {
                 return res.status(401).json({message: "Pas de post trovué ! "})
             }
@@ -94,7 +95,8 @@ module.exports.updatePost = (req, res, next) => {
             //     })
             // }
 
-            if (req.files.posts) {
+            if (req.files && req.files.post) {
+                const filename = post.imageUrl.split('/images/posts')[1];
                 fs.unlink(`images/posts/${filename}`, () => {
                     const postObject = {
                         content,

@@ -133,11 +133,12 @@ export default {
         password: this.password
       }).then((response) => {
         this.login();
+        this.$router.push("/posts")
         console.log(response)
       }).catch((error) => {
         console.log(error)
       })
-      console.log(this.email, this.firstName, this.lastName, this.poste, this.password)
+
     },
   },
 }

@@ -47,16 +47,17 @@ export default createStore({
             createdAt: "",
             temps: ""
         },
-        deleteUser: null,
+        deleteUserStatus: null,
         // POSTS
-        allPosts: []
+        allPosts: [],
+        postCreatedAt: []
 
     },
     getters: {
         getUser: function (state) {
             return state.userInfos
         },
-        getAllPosts: function (state){
+        getAllPosts: function (state) {
             return state.allPosts
         },
     },
@@ -115,18 +116,32 @@ export default createStore({
             console.log("updatebio", updateUserBio)
         },
 
-        deleteUser: function (state, deleteUser) {
+        deleteUser: function (state, deleteUserStatus) {
             state.user = {
                 uuidUser: "-1",
                 token: "",
             }
             localStorage.removeItem('user')
-            state.deleteUser = deleteUser
-            console.log(deleteUser)
+            state.deleteUserStatus = deleteUserStatus
+            
         },
 
         //POSTS
-        allPosts: function (state, allPosts){
+        allPosts: function (state, allPosts) {
+            allPosts.forEach((post) => {
+                const datePostCreat = new Date(post.createdAt)
+                console.log(datePostCreat)
+                let dateLocal = datePostCreat.toLocaleString('fr-FR', {
+                    hour:'numeric',
+                    minute:'numeric',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                });
+                console.log(state.postCreatedAt)
+            return post.createdAt = dateLocal
+            })
+
             state.allPosts = allPosts
         }
     },
@@ -272,11 +287,11 @@ export default createStore({
 
                     instance.delete('/' + payloadDeleteUser.uuidUser)
                         .then((response) => {
-                            commit('deleteUser', true)
+                            commit('deleteUserStatus', true)
                             console.log(response)
                         })
                         .catch((err) => {
-                            commit('deleteUser', false)
+                            commit('deleteUserStatus', false)
                             console.log(err)
                         })
 
@@ -291,7 +306,7 @@ export default createStore({
 
         getAllPosts: ({commit}) => {
             commit("setStatus", "loading_posts")
-            instancePosts.get('/' )
+            instancePosts.get('/')
                 .then((response) => {
                     const user = localStorage.getItem('user')
                     const uuidUser = JSON.parse(user)
@@ -299,10 +314,10 @@ export default createStore({
                     response.data.forEach((post) => {
                         if (uuidUser.uuidUser === post.User.uuid) {
                             post.buttonModify = true
-                            post.buttonDelete =  true
+                            post.buttonDelete = true
                         } else {
                             post.buttonModify = false
-                            post.buttonDelete =  false
+                            post.buttonDelete = false
                         }
                     })
                     commit('allPosts', response.data)
@@ -315,28 +330,48 @@ export default createStore({
         },
 
         addPost: ({commit}, payloadAddPost) => {
-            console.log("log Payloade dans addPost : ",payloadAddPost)
+            console.log("log Payloade dans addPost : ", payloadAddPost)
             commit("setStatus", "addpost_ok")
-            instancePosts.post('/createpost', payloadAddPost ,{
+            instancePosts.post('/createpost', payloadAddPost, {
                 headers: {
                     'Accept': '*/*',
                     'Content-Type': 'application/json; charset=utf-8'
                 }
             })
-                .then((response)=> {
-                    console.log("response addPost :",response)
+                .then((response) => {
+                    console.log("response addPost :", response)
                 })
                 .catch((err) => {
                     console.log(err)
                 })
         },
 
-        deletePost: ({commit}, payloadDeletePost) =>{
-            console.log("log Payloade dans addPost : ",payloadDeletePost)
+        deletePost: ({commit}, payloadDeletePost) => {
+            console.log("log Payloade dans addPost : ", payloadDeletePost)
             commit("setStatus", "post_posted")
-            instancePosts.delete('/' + payloadDeletePost.uuid )
-                .then((response)=> {
-                    console.log("Post delete :",response)
+            instancePosts.delete('/' + payloadDeletePost.uuid)
+                .then((response) => {
+                    console.log("Post delete :", response)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        },
+
+        updatePost: ({commit}, payloadUpdatePost) => {
+            console.log("log Payloade dans addPost : ", payloadUpdatePost)
+            commit("setStatus", "post_posted")
+            instancePosts.put('/' + payloadUpdatePost.uuidPost, {
+                content: payloadUpdatePost.content,
+                uuid: payloadUpdatePost.uuid
+            }, {
+                headers: {
+                    'Accept': '*/*',
+                    'Content-Type': 'application/json; charset=utf-8'
+                }
+            })
+                .then((response) => {
+                    console.log("Post update :", response)
                 })
                 .catch((err) => {
                     console.log(err)

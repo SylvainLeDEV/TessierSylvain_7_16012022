@@ -7,12 +7,14 @@ const routes = [
     path: '/',
     name: 'Login',
     component: Login,
+    props: true
 
   },
   {
-    path: '/profile',
+    path: '/profile/:uuid',
     name: 'Profile',
     component: Profile,
+    props:true
   },
   {
     path: '/posts',

@@ -63,7 +63,7 @@
         <header class="post__header">
           <img class="post__header-img" :src="post.User.picture" alt="Image profile">
           <div class="post__header-text">
-            <router-link :to="{ name: 'Profile'}" @click="getUserProfile">
+            <router-link @click="getUserProfile(post)" :to="{ name: 'Profile', params:{uuid : post.User.uuid}}">
               <div class="post__header-pseudo"> {{ post.User.firstName }}</div>
             </router-link>
             <div class="post__header-date"> {{ post.createdAt }}</div>
@@ -72,15 +72,15 @@
 
         <div class="post__body">
           <img class="post__body-img" v-if="post.imageUrl !== null " :src="post.imageUrl" alt="Image du post">
-          <div  v-if="updatePostTextArea[post.id]"  >
-          <textarea v-model="postUpdate" >
+          <div v-if="updatePostTextArea[post.id]">
+          <textarea v-model="postUpdate" placeholder="Modifies ton post">
           </textarea>
             <v-btn
                 color="success"
                 icon
                 depressed
                 size="small"
-                @click="updatePost(post)"
+                @click="validUpdatePost(post)"
             >
               <v-icon>mdi-check or done</v-icon>
             </v-btn>
@@ -139,6 +139,7 @@ import {mapState} from "vuex";
 export default {
 
   name: 'Posts',
+  props:[],
 
   data() {
     return {
@@ -147,7 +148,8 @@ export default {
       imageUrl: "",
       renderComponent: true,
       updatePostTextArea: [],
-      postUpdate : [],
+      postUpdate: [],
+      postCreatedAt: ''
 
     }
   },
@@ -242,27 +244,43 @@ export default {
           .then(() => {
             setTimeout(() => {
               this.forceRerender()
-            }, 100)
+            }, 500)
           })
 
     },
 
     updatePost: function (event, post) {
 
-      console.log(this.postUpdate)
       this.updatePostTextArea[post.id] = !this.updatePostTextArea[post.id]
 
-      // const pauloadDeletePost = {
-      //   uuid: post.uuid
-      //
-      // }
+    },
+
+    validUpdatePost: function (post) {
+
+      const payloadUpdatePost = {
+        uuidPost: post.uuid,
+        uuid: post.User.uuid,
+        content: this.postUpdate
+      }
+      console.log("payload", payloadUpdatePost)
+
+      this.$store.dispatch('updatePost', payloadUpdatePost)
+          .then(() => {
+            setTimeout(() => {
+              this.forceRerender()
+            }, 500)
+          })
+      this.updatePostTextArea[post.id] = !this.updatePostTextArea[post.id]
+
 
     },
+
   },
   computed: {
 
     ...mapState({
       allPosts: 'allPosts',
+      postCreatedAt : 'postCreatedAt',
       userInfos: 'userInfos'
     }),
 
