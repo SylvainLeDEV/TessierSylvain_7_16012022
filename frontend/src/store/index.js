@@ -56,6 +56,9 @@ export default createStore({
         getUser: function (state) {
             return state.userInfos
         },
+        getAllPosts: function (state){
+            return state.allPosts
+        },
     },
 
     mutations: {
@@ -295,10 +298,10 @@ export default createStore({
 
                     response.data.forEach((post) => {
                         if (uuidUser.uuidUser === post.User.uuid) {
-
+                            post.buttonModify = true
                             post.buttonDelete =  true
                         } else {
-
+                            post.buttonModify = false
                             post.buttonDelete =  false
                         }
                     })
