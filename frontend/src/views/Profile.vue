@@ -115,8 +115,12 @@ export default {
       this.$router.push("/")
       return;
     }
+    console.log(location.href.substring(location.href.lastIndexOf('/')+1))
 
-    const uuidUser = this.$store.state.user.uuidUser
+    // const uuidUser
+
+    // const uuidUser = this.$store.state.user.uuidUser
+    const uuidUser = location.href.substring(location.href.lastIndexOf('/')+1)
     this.$store.dispatch('getUserInfos', uuidUser)
   },
   mounted: function () {
@@ -239,12 +243,13 @@ export default {
         email:this.$store.state.userInfos.email,
         password: valeurPassword,
       }
+      console.log(payloadDeleteUser)
 
       this.$store.dispatch('deleteUser', payloadDeleteUser)
           .then(() => {
             if(this.$store.state.status === "error_password"){
               alert('Mon de passe incorrect')
-            } else if (this.$store.state.deleteUser === true) {
+            } else if (this.$store.state.deleteUserStatus === true) {
               this.$store.commit('deleteUser')
               this.$router.push("/")
               alert("Profile supprimer")
@@ -252,11 +257,6 @@ export default {
               alert('Utilisateur non trouvé')
             }
           })
-
-
-      // console.log('test')
-      // this.$store.commit('deleteUser')
-      // this.$router.push("/")
 
     }
 

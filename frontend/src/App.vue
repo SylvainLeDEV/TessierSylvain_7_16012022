@@ -18,7 +18,7 @@
           <v-list-item-group v-model="group" active-class="deep-purple--text text--accent-4">
             <v-list-item prepend-icon="mdi-home" title="Groupomania" to="/posts"></v-list-item>
 
-            <v-list-item prepend-icon="mdi-account" title="Profile" to="/profile"></v-list-item>
+            <v-list-item prepend-icon="mdi-account" title="Profile" :to="{name : 'Profile', params:{ uuid : uuid }}"></v-list-item>
           </v-list-item-group>
         </v-list>
       </v-navigation-drawer>
@@ -36,13 +36,20 @@
 
 <script>
 
+
 // import Loader from "@/components/Loader";
 export default {
+
+  mounted() {
+    const user = JSON.parse(localStorage.getItem('user'))
+    this.uuid = user.uuidUser
+  },
   name: 'App',
   // components: {Loader},
   data: () => ({
     drawer: false,
     group: null,
+    uuid : ''
   }),
 }
 </script>
