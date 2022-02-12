@@ -22,6 +22,15 @@ module.exports.readPost = (req, res, next) => {
             const post = posts.sort(function (a, b) {
                 return b.createdAt - a.createdAt
             })
+
+            posts.forEach((post) => {
+                const comment = post.comment.sort(function (a, b) {
+                    return b.createdAt - a.createdAt;
+                })
+                console.log("ICICICI", post.comment)
+                return post.comment = comment;
+            })
+
             return res.status(200).json(post)
         })
         .catch((error) => {
@@ -235,12 +244,12 @@ module.exports.deletePost = (req, res, next) => {
 
 module.exports.createCommentPost = async (req, res, next) => {
     const {content, videoUrl, postUuid, posterId} = req.body
-    console.log("Req.file", req.file)
-    const imageUrl = `${req.protocol}://${req.get('host')}/images/comment/${req.files.comment[0].filename}`
+    let imageUrl = null
+    if (req.files) {
+        const imageUrl = `${req.protocol}://${req.get('host')}/images/comment/${req.files.comment[0].filename}`
+    }
     User.findOne({where: {uuid: posterId}})
         .then((user) => {
-            const userId = user.id
-            console.log("la userid", userId)
             Posts.findOne({where: {uuid: postUuid}})
                 .then((post) => {
                     console.log(post)
@@ -253,9 +262,10 @@ module.exports.createCommentPost = async (req, res, next) => {
                         content,
                         imageUrl,
                         videoUrl,
+                        pictureUserProfile: user.picture,
                         postId: post.id,
                         posterId: posterId,
-                        userId: userId
+                        userId: user.id
                     })
                         .then(() => {
                                 res.status(201).json({
@@ -270,7 +280,18 @@ module.exports.createCommentPost = async (req, res, next) => {
                             }
                         );
                 })
+                .catch((error) => {
+                    res.status(400).json({
+                        error: error
+                    })
+                })
         })
+        .catch((error) => {
+            res.status(400).json({
+                error: error
+            })
+        })
+
 }
 
 module.exports.getCommentPost = (req, res, next) => {

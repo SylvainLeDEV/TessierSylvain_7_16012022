@@ -113,10 +113,9 @@ export default createStore({
 
         updateUserBio: function (state, updateUserBio) {
             state.bio = updateUserBio
-            console.log("updatebio", updateUserBio)
         },
 
-        deleteUser: function (state, deleteUserStatus) {
+        deleteUserStatus: function (state, deleteUserStatus) {
             state.user = {
                 uuidUser: "-1",
                 token: "",
@@ -130,7 +129,6 @@ export default createStore({
         allPosts: function (state, allPosts) {
             allPosts.forEach((post) => {
                 const datePostCreat = new Date(post.createdAt)
-                console.log(datePostCreat)
                 let dateLocal = datePostCreat.toLocaleString('fr-FR', {
                     hour:'numeric',
                     minute:'numeric',
@@ -138,7 +136,6 @@ export default createStore({
                     month: 'long',
                     day: 'numeric',
                 });
-                console.log(state.postCreatedAt)
             return post.createdAt = dateLocal
             })
 
@@ -276,16 +273,16 @@ export default createStore({
                 })
         },
 
-        deleteUser: ({commit}, payloadDeleteUser) => {
-            instance.post('/login', {
+        deleteUser: async ({commit}, payloadDeleteUser) => {
+             await instance.post('/login', {
                 email: payloadDeleteUser.email,
                 password: payloadDeleteUser.password
             })
-                .then((response) => {
+                .then( async (response) => {
                     commit('setStatus', 'user_ok')
                     console.log(response)
 
-                    instance.delete('/' + payloadDeleteUser.uuidUser)
+                    await instance.delete('/' + payloadDeleteUser.uuidUser)
                         .then((response) => {
                             commit('deleteUserStatus', true)
                             console.log(response)
@@ -310,7 +307,7 @@ export default createStore({
                 .then((response) => {
                     const user = localStorage.getItem('user')
                     const uuidUser = JSON.parse(user)
-
+                    console.log("getAllPosts in STORE",response)
                     response.data.forEach((post) => {
                         if (uuidUser.uuidUser === post.User.uuid) {
                             post.buttonModify = true
@@ -321,7 +318,6 @@ export default createStore({
                         }
                     })
                     commit('allPosts', response.data)
-                    console.log(response.data)
                 })
                 .catch((err) => {
                     commit('setStatus', "no_posts")
@@ -329,15 +325,9 @@ export default createStore({
                 })
         },
 
-        addPost: ({commit}, payloadAddPost) => {
-            console.log("log Payloade dans addPost : ", payloadAddPost)
+        addPost: async ({commit}, payloadAddPost) => {
             commit("setStatus", "addpost_ok")
-            instancePosts.post('/createpost', payloadAddPost, {
-                headers: {
-                    'Accept': '*/*',
-                    'Content-Type': 'application/json; charset=utf-8'
-                }
-            })
+            await instancePosts.post('/createpost', payloadAddPost)
                 .then((response) => {
                     console.log("response addPost :", response)
                 })
@@ -346,10 +336,10 @@ export default createStore({
                 })
         },
 
-        deletePost: ({commit}, payloadDeletePost) => {
+        deletePost: async ({commit}, payloadDeletePost) => {
             console.log("log Payloade dans addPost : ", payloadDeletePost)
             commit("setStatus", "post_posted")
-            instancePosts.delete('/' + payloadDeletePost.uuid)
+            await instancePosts.delete('/' + payloadDeletePost.uuid)
                 .then((response) => {
                     console.log("Post delete :", response)
                 })
@@ -358,10 +348,10 @@ export default createStore({
                 })
         },
 
-        updatePost: ({commit}, payloadUpdatePost) => {
+        updatePost: async ({commit}, payloadUpdatePost) => {
             console.log("log Payloade dans addPost : ", payloadUpdatePost)
             commit("setStatus", "post_posted")
-            instancePosts.put('/' + payloadUpdatePost.uuidPost, {
+           await instancePosts.put('/' + payloadUpdatePost.uuidPost, {
                 content: payloadUpdatePost.content,
                 uuid: payloadUpdatePost.uuid
             }, {
@@ -377,6 +367,18 @@ export default createStore({
                     console.log(err)
                 })
         },
+
+        addCommentPost: async ({commit}, payloadAddComment) =>{
+            commit("setStatus", "addComment_ok")
+            await instancePosts.patch('/create-comment-post', payloadAddComment)
+                .then((response) => {
+                    console.log("response addComent :", response)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
+
     },
     modules: {}
 })
