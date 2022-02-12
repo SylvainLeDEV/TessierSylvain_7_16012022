@@ -57,7 +57,7 @@
     <!---->
 
     <!--    container posts and comment-->
-    <main class="main" v-if="renderComponent">
+    <main class="main" :key="componentKey">
       <div class="post" v-for="post in allPosts" :key="post.id">
 
         <header class="post__header">
@@ -90,17 +90,21 @@
         </div>
 
         <div class="post__footer">
-          <v-btn
-              v-if="post.buttonDelete"
-              class="post__footer-btn-delete"
-              color="error"
-              depressed
-              icon
-              size="small"
-              @click="deletePost(post)"
-          >
-            <v-icon>mdi-delete outline</v-icon>
-          </v-btn>
+
+          <div class="post__footer-btn-comment">
+            <v-btn
+                text
+                icon
+                size="small"
+                color="none"
+                @click="addCommentPost(post)">
+              <v-icon>mdi-comment processing outline</v-icon>
+            </v-btn>
+            <p class="post__footer-btn-comment-p">
+              {{ post.comment.length }}
+            </p>
+          </div>
+
           <v-btn
               v-if="post.buttonModify"
               class="post__footer-btn-modify"
@@ -112,17 +116,47 @@
           >
             <v-icon>mdi-pencil outline</v-icon>
           </v-btn>
-          <div class="post__footer-btn-comment">
+
+          <v-btn
+              v-if="post.buttonDelete"
+              class="post__footer-btn-delete"
+              color="error"
+              depressed
+              icon
+              size="small"
+              @click="deletePost(post)"
+          >
+            <v-icon>mdi-delete outline</v-icon>
+          </v-btn>
+
+
+        </div>
+
+        <div class="comment" v-if="commentPost[post.id]">
+          <div class="comment__add">
+            <textarea class="comment__add-text" v-model="contentCommentPost" placeholder="Votre commentaire...">
+          </textarea>
             <v-btn
-                text
-                icon
-                size="small"
-                color="none">
-              <v-icon>mdi-comment processing outline</v-icon>
+                class="comment__add-btn"
+                color="success"
+                depressed
+                @click="validAddComment(post)"
+
+            >
+              Publier
             </v-btn>
-            <p class="post__footer-btn-comment-p">
-              {{ post.comment.length }}
-            </p>
+
+          </div>
+
+          <div class="comment__containerComent" v-for="comment in post.comment" :key="comment.id">
+
+            <img class="post__header-img" :src="comment.pictureUserProfile" alt="Image profile">
+              <router-link :to="{ name: 'Profile', params:{uuid : comment.posterId}}">
+                <div class="comment__containerComent-pseudo"> {{ comment.userName }}</div>
+              </router-link>
+              <p class="comment__containerComent-content" > {{ comment.content }} </p>
+              <p class="comment__containerComent-date"> {{ comment.createdAt }}</p>
+
           </div>
         </div>
 
@@ -139,17 +173,19 @@ import {mapState} from "vuex";
 export default {
 
   name: 'Posts',
-  props:[],
+  props: [],
 
   data() {
     return {
       contentPost: '',
+      contentCommentPost: '',
       image: null,
       imageUrl: "",
-      renderComponent: true,
       updatePostTextArea: [],
       postUpdate: [],
-      postCreatedAt: ''
+      commentPost: [],
+      componentKey: 0,
+      uuidUser:'',
 
     }
   },
@@ -157,19 +193,16 @@ export default {
   mounted: function () {
     this.$store.dispatch('getAllPosts')
 
+    const localStorageUser = JSON.parse(localStorage.getItem('user'))
+    const uuidUser = localStorageUser.uuidUser
+    this.uuidUser = uuidUser
+
   },
 
   methods: {
     forceRerender() {
+      this.componentKey++
       this.$store.dispatch('getAllPosts')
-          .then(() => {
-            this.renderComponent = false
-          })
-          .then(() => {
-            this.$nextTick(() => {
-            })
-            this.renderComponent = true
-          })
     },
     addPictureOnPosts: function () {
       this.$refs.fileInputPosts.click();
@@ -202,7 +235,7 @@ export default {
       const uuidUser = JSON.parse(user)
 
       if (this.image !== null) {
-        console.log(" ou LA")
+
         const formData = new FormData()
         formData.append('posts', this.image);
         formData.append('content', this.contentPost);
@@ -217,7 +250,7 @@ export default {
       } else if (this.contentPost === '') {
         alert("Ecris ton meilleur post !! ")
       } else {
-        console.log("ICI")
+
         const payloadAddPost = {
           imageUrl: null,
           content: this.contentPost,
@@ -225,9 +258,7 @@ export default {
         };
         this.$store.dispatch('addPost', payloadAddPost)
             .then(() => {
-              setTimeout(() => {
-                this.forceRerender()
-              }, 100)
+              this.forceRerender()
             })
       }
       this.contentPost = ''
@@ -237,14 +268,12 @@ export default {
 
     deletePost: function (post) {
 
-      console.log(post)
+
       const payloadDeletePost = {uuid: post.uuid}
 
       this.$store.dispatch('deletePost', payloadDeletePost)
           .then(() => {
-            setTimeout(() => {
-              this.forceRerender()
-            }, 500)
+            this.forceRerender()
           })
 
     },
@@ -262,16 +291,30 @@ export default {
         uuid: post.User.uuid,
         content: this.postUpdate
       }
-      console.log("payload", payloadUpdatePost)
 
       this.$store.dispatch('updatePost', payloadUpdatePost)
           .then(() => {
-            setTimeout(() => {
-              this.forceRerender()
-            }, 500)
+            this.forceRerender()
           })
       this.updatePostTextArea[post.id] = !this.updatePostTextArea[post.id]
+    },
 
+    addCommentPost: function (post) {
+      this.commentPost[post.id] = !this.commentPost[post.id]
+    },
+    validAddComment:function (post){
+      console.log(this.contentCommentPost)
+
+      const payloadAddComment = {
+        content: this.contentCommentPost,
+        postUuid: post.uuid,
+        posterId: this.uuidUser
+      };
+
+      this.$store.dispatch('addCommentPost', payloadAddComment)
+          .then(() => {
+            this.forceRerender()
+          })
 
     },
 
@@ -280,7 +323,7 @@ export default {
 
     ...mapState({
       allPosts: 'allPosts',
-      postCreatedAt : 'postCreatedAt',
+      postCreatedAt: 'postCreatedAt',
       userInfos: 'userInfos'
     }),
 
@@ -298,8 +341,8 @@ export default {
 .post {
   margin-top: 10px;
   border: solid 1px #DBDBDB;
-  background: #FFF;
   border-radius: 5px;
+  background: #FFF;
 
   &__header {
     padding: 5px;
@@ -350,6 +393,35 @@ export default {
       position: absolute;
       top: 25px;
       left: 25px;
+    }
+  }
+}
+
+.comment {
+
+
+  margin: 5px;
+
+  &__add {
+    border: solid 1px #DBDBDB;
+    border-radius: 5px;
+    display: flex;
+    padding: 10px;
+    justify-content: space-around;
+    align-items: center;
+
+    &-text {
+      background: #fff;
+      border: 1px solid #dddfe2;
+      box-shadow: inset 0 1px 1px 0 rgb(0 0 0 / 7%);
+      margin-left: 0;
+      padding: 8px;
+    }
+
+    &-btn {
+      background-color: #4080ff;
+      padding: 5px;
+
     }
   }
 }

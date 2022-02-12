@@ -3,7 +3,7 @@
   <div class="card">
 
     <h1 class="card__title">{{ user.firstName }}, {{ user.lastName }} </h1>
-<!--    <h1 class="card__title" v-else>{{ user.firstName }}, {{ user.lastName }} </h1>-->
+    <!--    <h1 class="card__title" v-else>{{ user.firstName }}, {{ user.lastName }} </h1>-->
     <p class="card__subtitle">Voilà donc qui je suis...</p>
 
     <!--// L'image de PROFILE-->
@@ -20,7 +20,9 @@
           size="small"
       ></v-btn>
 
-      <v-btn class="card__picture-btn ma-2" @click="updatePictureProfile"
+      <v-btn class="card__picture-btn ma-2"
+             v-if="getUserUuid"
+             @click="updatePictureProfile"
              text
              icon
              size="small"
@@ -44,7 +46,7 @@
       <p class="profile__temps"> ça fait <span> {{ tempsParmiNous }} jours </span> que tu es parmi nous en tant que :
       </p>
       <div>
-        <select v-model="poste" name="poste" id="poste" @change="updatePoste" ref="poste" class="profile__poste">
+        <select v-if="getUserUuid" v-model="poste" name="poste" id="poste" @change="updatePoste" ref="poste" class="profile__poste">
           <option value="">{{ user.poste }}</option>
           <option value="Directeur général">Directeur général</option>
           <option value="Digital Brand Manager">Digital Brand Manager</option>
@@ -53,6 +55,11 @@
           <option value="Développeur">Développeur</option>
           <option value="Designer">Designer</option>
         </select>
+
+        <p class="profile__poste" v-else>
+          {{ user.poste }}
+        </p>
+
       </div>
 
       <v-textarea
@@ -60,8 +67,8 @@
           @input="$emit('input', $event.target.value)"
           @change="updateBio"
           color="teal"
+          v-if="getUserUuid"
       >
-
         <template v-slot:label>
           <div>
             Bio <small>(optional)</small><br/>
@@ -69,19 +76,27 @@
         </template>
       </v-textarea>
 
+      <div v-else class="profile__bio" >
+        <h3> Ma bio : </h3>
+              <p class="profile__bio" >
+
+                {{ user.bio }}
+              </p>
+      </div>
+
     </div>
 
     <!--//Butoon DECONNEXION / MODOFIER / SUPPRIMER PROFILE-->
     <div class="form-row">
-      <button @click="logout" class="button">
+      <button @click="logout" class="button" v-if="getUserUuid">
         Déconnexion
       </button>
-      <button class="button">
+      <button class="button" v-if="getUserUuid">
         <UpdateInfoUser/>
       </button>
     </div>
 
-    <button @click="deleteProfile" class="button button__deleteUser">
+    <button @click="deleteProfile" class="button button__deleteUser" v-if="getUserUuid">
       Supprimer le profile (Définitif)
     </button>
 
@@ -115,13 +130,19 @@ export default {
       this.$router.push("/")
       return;
     }
-    console.log(location.href.substring(location.href.lastIndexOf('/')+1))
+    // console.log(location.href.substring(location.href.lastIndexOf('/')+1))
 
-    // const uuidUser
-
+    const userStorage = JSON.parse(localStorage.getItem('user'))
+    const uuidUserStorage = userStorage.uuidUser
     // const uuidUser = this.$store.state.user.uuidUser
-    const uuidUser = location.href.substring(location.href.lastIndexOf('/')+1)
+    const uuidUser = location.href.substring(location.href.lastIndexOf('/') + 1)
     this.$store.dispatch('getUserInfos', uuidUser)
+
+    if (uuidUserStorage !== uuidUser) {
+      console.log(uuidUserStorage, uuidUser, " true ou fals ", uuidUserStorage === uuidUser)
+      return this.getUserUuid = false
+    }
+
   },
   mounted: function () {
 
@@ -139,9 +160,10 @@ export default {
       profileCreatedAt: "",
       poste: '',
       bio: '',
-      firstName:"",
-      lastName:"",
-      email:"",
+      firstName: "",
+      lastName: "",
+      email: "",
+      getUserUuid: true,
     }
   },
 
@@ -233,24 +255,26 @@ export default {
 
     },
 
-    deleteProfile: function (){
+    deleteProfile: function () {
 
       let valeurPassword = prompt('Renseigner votre mot de passe pour valider')
 
 
       const payloadDeleteUser = {
         uuidUser: this.$store.state.user.uuidUser,
-        email:this.$store.state.userInfos.email,
+        email: this.$store.state.userInfos.email,
         password: valeurPassword,
       }
       console.log(payloadDeleteUser)
 
       this.$store.dispatch('deleteUser', payloadDeleteUser)
           .then(() => {
-            if(this.$store.state.status === "error_password"){
+            console.log(this.$store.state.deleteUserStatus)
+            console.log(this.$store.state.status)
+            if (this.$store.state.status === "error_password") {
               alert('Mon de passe incorrect')
             } else if (this.$store.state.deleteUserStatus === true) {
-              this.$store.commit('deleteUser')
+              this.$store.commit('deleteUserStatus')
               this.$router.push("/")
               alert("Profile supprimer")
             } else {
@@ -263,11 +287,11 @@ export default {
   },
 
   computed: {
-    tempsParmiNous(){
+    tempsParmiNous() {
       const creatAt = new Date(this.$store.state.createdAt.temps)
       const dateNow = new Date()
-      const diffDate = new Date(dateNow.getTime()- creatAt.getTime())
-      return  diffDate.getUTCDate()
+      const diffDate = new Date(dateNow.getTime() - creatAt.getTime())
+      return diffDate.getUTCDate()
     },
 
     bioValue() {
@@ -284,10 +308,10 @@ export default {
       picture: "pictureProfile",
       bio: "bio",
       poste: "poste",
-      dataUserForInfos:{
+      dataUserForInfos: {
         firstNameUpdate: "firstName",
-        lastNameUpdate:"lastName",
-        emailUpdate:"email"
+        lastNameUpdate: "lastName",
+        emailUpdate: "email"
       },
     }),
   }
@@ -361,8 +385,12 @@ export default {
       min-width: 100px;
       color: black;
     }
+    &__bio{
+
+    }
   }
-  .button__deleteUser{
+
+  .button__deleteUser {
     background: #CF6679;
   }
 }
