@@ -86,7 +86,7 @@
             </v-btn>
           </div>
 
-          <p class="post__body-content">{{ post.content }}</p>
+          <p v-else class="post__body-content">{{ post.content }}</p>
         </div>
 
         <div class="post__footer">
@@ -150,14 +150,57 @@
 
           <div class="comment__containerComent" v-for="comment in post.comment" :key="comment.id">
 
-            <img class="post__header-img" :src="comment.pictureUserProfile" alt="Image profile">
-              <router-link :to="{ name: 'Profile', params:{uuid : comment.posterId}}">
-                <div class="comment__containerComent-pseudo"> {{ comment.userName }}</div>
-              </router-link>
-              <p class="comment__containerComent-content" > {{ comment.content }} </p>
-              <p class="comment__containerComent-date"> {{ comment.createdAt }}</p>
+            <div class="comment__containerComent-pseudo-date-img">
+              <img class="comment__containerComent-img" :src="comment.userComment.picture" alt="Image profile">
+              <div>
+                <router-link :to="{ name: 'Profile', params:{uuid : comment.posterId}}">
+                  <div class="comment__containerComent-pseudo"> {{ comment.userName }}</div>
+                </router-link>
+                <p class="comment__containerComent-date"> {{ comment.createdAt }}</p>
+              </div>
+            </div>
+            <div v-if="updateCommentTextArea[comment.id]">
+          <textarea v-model="commentUpdate" placeholder="Modifies ton commentaire">
+          </textarea>
+              <v-btn
+                  color="success"
+                  icon
+                  depressed
+                  size="small"
+                  @click="validUpdateComment(comment)"
+              >
+                <v-icon>mdi-check or done</v-icon>
+              </v-btn>
+            </div>
+            <p v-else class="comment__containerComent-content"> {{ comment.content }} </p>
 
+            <div class="comment__containerComent-btn">
+              <v-btn
+                  v-if="comment.buttonModify"
+                  class="comment__containerComent-btn-modify"
+                  color="success"
+                  icon
+                  depressed
+                  size="x-small"
+                  @click="updateComment(comment)"
+              >
+                <v-icon>mdi-pencil outline</v-icon>
+              </v-btn>
+
+              <v-btn
+                  v-if="comment.buttonDelete"
+                  class="comment__containerComent-btn-delete"
+                  color="error"
+                  depressed
+                  icon
+                  size="x-small"
+                  @click="deleteComment(comment)"
+              >
+                <v-icon>mdi-delete outline</v-icon>
+              </v-btn>
+            </div>
           </div>
+
         </div>
 
       </div>
@@ -182,10 +225,12 @@ export default {
       image: null,
       imageUrl: "",
       updatePostTextArea: [],
+      updateCommentTextArea:[],
       postUpdate: [],
       commentPost: [],
       componentKey: 0,
-      uuidUser:'',
+      commentUpdate:[],
+      uuidUser: '',
 
     }
   },
@@ -273,6 +318,7 @@ export default {
 
       this.$store.dispatch('deletePost', payloadDeletePost)
           .then(() => {
+
             this.forceRerender()
           })
 
@@ -302,7 +348,8 @@ export default {
     addCommentPost: function (post) {
       this.commentPost[post.id] = !this.commentPost[post.id]
     },
-    validAddComment:function (post){
+
+    validAddComment: function (post) {
       console.log(this.contentCommentPost)
 
       const payloadAddComment = {
@@ -316,8 +363,40 @@ export default {
             this.forceRerender()
           })
 
+      this.contentCommentPost = ''
+
     },
 
+    deleteComment: function (comment){
+      const payloadDeleteComment = {uuid: comment.uuid}
+
+      this.$store.dispatch('deleteComment', payloadDeleteComment)
+          .then(() => {
+            this.forceRerender()
+          })
+
+    },
+
+    updateComment:function (comment){
+
+      this.updateCommentTextArea[comment.id] = !this.updateCommentTextArea[comment.id]
+
+    },
+
+    validUpdateComment:function (comment){
+      console.log(this.commentUpdate)
+      const payloadUpdateComment = {
+
+        uuidComment: comment.uuid,
+        content: this.commentUpdate
+      }
+
+      this.$store.dispatch('updateComment', payloadUpdateComment)
+          .then(() => {
+            this.forceRerender()
+          })
+      this.updateCommentTextArea[comment.id] = !this.updateCommentTextArea[comment.id]
+    },
   },
   computed: {
 
@@ -424,6 +503,41 @@ export default {
 
     }
   }
+
+  &__containerComent {
+    border: solid 1px #DBDBDB;
+    border-radius: 5px;
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px 10px 10px 15px;
+
+    &-img {
+      width: 45px;
+      height: 45px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    &-pseudo-date-img {
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      & > div {
+        padding-left: 10px;
+      }
+    }
+
+    &-btn{
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+  }
+
 }
 
 </style>

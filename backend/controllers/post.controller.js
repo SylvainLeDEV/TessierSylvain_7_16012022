@@ -14,7 +14,11 @@ module.exports.readPost = (req, res, next) => {
             },
             {
                 model: Comments,
-                as: 'comment'
+                as: 'comment',
+                include: [{
+                    model: User,
+                    as: 'userComment'
+                }]
             }
         ]
     })
@@ -27,7 +31,6 @@ module.exports.readPost = (req, res, next) => {
                 const comment = post.comment.sort(function (a, b) {
                     return b.createdAt - a.createdAt;
                 })
-                console.log("ICICICI", post.comment)
                 return post.comment = comment;
             })
 
@@ -93,7 +96,6 @@ module.exports.updatePost = (req, res, next) => {
     Posts.findOne({where: {uuid: uuidPost}})
         .then((post) => {
 
-            console.log("ici")
             if (!post) {
                 return res.status(401).json({message: "Pas de post trovué ! "})
             }
@@ -155,7 +157,11 @@ module.exports.deletePost = (req, res, next) => {
             },
             {
                 model: Comments,
-                as: 'comment'
+                as: 'comment',
+                include: [{
+                    model: User,
+                    as: 'userComment'
+                }]
             }
         ]
     })
@@ -252,10 +258,9 @@ module.exports.createCommentPost = async (req, res, next) => {
         .then((user) => {
             Posts.findOne({where: {uuid: postUuid}})
                 .then((post) => {
-                    console.log(post)
+
                     if (!post)
                         return res.status(401).json({message: "Post non trouvé !"})
-                    console.log(post)
 
                     Comments.create({
                         userName: user.firstName,
@@ -325,7 +330,6 @@ module.exports.editCommentPost = (req, res, next) => {
     const {content, videoUrl} = req.body
     Comments.findOne({where: {uuid: uuidComment}})
         .then((comment) => {
-            const filename = comment.imageUrl.split('/images/comment')[1];
             if (!comment) {
                 return res.status(401).json({message: "Pas de comentaire trouvé !"})
             }
@@ -335,7 +339,8 @@ module.exports.editCommentPost = (req, res, next) => {
             //         message: 'Unauthorized request',
             //     })
             // }
-            if (req.files.comment) {
+            if (req.files && req.files.comment) {
+                const filename = comment.imageUrl.split('/images/comment')[1];
                 console.log(req.files)
                 fs.unlink(`images/comment/${filename}`, () => {
                     const commentObject = {
@@ -380,16 +385,18 @@ module.exports.deleteCommentPost = (req, res, next) => {
         where: {uuid: uuidComment},
     })
         .then((comment) => {
-            console.log(comment)
 
             if (!comment) {
                 return res.status(401).json({message: "Pas de commentaire trovué ! "})
             }
-            const filename = comment.imageUrl.split('/images/comment/')[1];
-            fs.unlink(`images/comment/${filename}`, () => {
-            })
 
-            console.log(comment)
+            // let filename = null
+            // if (req.files && req.files.comment) {
+            //     const filename = comment.imageUrl.split('/images/comment/')[1];
+            //
+            //     fs.unlink(`images/comment/${filename}`, () => {
+            //     })
+            // }
             comment.destroy()
             return res.status(200).json({message: 'Comment destroy'})
         })
