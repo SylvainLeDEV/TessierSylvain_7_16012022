@@ -122,7 +122,7 @@ export default createStore({
             }
             localStorage.removeItem('user')
             state.deleteUserStatus = deleteUserStatus
-            
+
         },
 
         //POSTS
@@ -130,14 +130,38 @@ export default createStore({
             allPosts.forEach((post) => {
                 const datePostCreat = new Date(post.createdAt)
                 let dateLocal = datePostCreat.toLocaleString('fr-FR', {
-                    hour:'numeric',
-                    minute:'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                 });
-            return post.createdAt = dateLocal
+
+                post.comment.forEach((comment) => {
+                    const datePostCreat = new Date(comment.createdAt)
+
+                    const dateNow = new Date()
+                    const diffDate = new Date(dateNow.getTime() - datePostCreat.getTime())
+
+                    comment.createdAt = `${diffDate.getHours()}`
+
+                    for (let dateDiff of comment.createdAt){
+                        if (dateDiff < 1 ){
+                            comment.createdAt = `${diffDate.getMinutes()}min`
+                        } else if (dateDiff >= 1 ){
+                            comment.createdAt = `${diffDate.getHours()}h`
+                        } else if (dateDiff >= 24) {
+                            comment.createdAt = `${diffDate.getDay()} jour(s)`
+                        }
+
+                    }
+                })
+                return post.createdAt = dateLocal
             })
+            // const creatAt = new Date(this.$store.state.createdAt.temps)
+            // const diffDate = new Date(dateNow.getTime() - creatAt.getTime())
+            // return diffDate.getUTCDate()
+
 
             state.allPosts = allPosts
         }
@@ -274,11 +298,11 @@ export default createStore({
         },
 
         deleteUser: async ({commit}, payloadDeleteUser) => {
-             await instance.post('/login', {
+            await instance.post('/login', {
                 email: payloadDeleteUser.email,
                 password: payloadDeleteUser.password
             })
-                .then( async (response) => {
+                .then(async (response) => {
                     commit('setStatus', 'user_ok')
                     console.log(response)
 
@@ -301,13 +325,13 @@ export default createStore({
 
         //POSTS
 
-        getAllPosts: ({commit}) => {
+        getAllPosts: async ({commit}) => {
             commit("setStatus", "loading_posts")
-            instancePosts.get('/')
+           await instancePosts.get('/')
                 .then((response) => {
                     const user = localStorage.getItem('user')
                     const uuidUser = JSON.parse(user)
-                    console.log("getAllPosts in STORE",response)
+                    console.log("getAllPosts in STORE", response)
                     response.data.forEach((post) => {
                         if (uuidUser.uuidUser === post.User.uuid) {
                             post.buttonModify = true
@@ -316,6 +340,17 @@ export default createStore({
                             post.buttonModify = false
                             post.buttonDelete = false
                         }
+
+                        post.comment.forEach((comment) => {
+                            if (uuidUser.uuidUser === comment.posterId) {
+                                comment.buttonModify = true
+                                comment.buttonDelete = true
+                            } else {
+                                comment.buttonModify = false
+                                comment.buttonDelete = false
+                            }
+                        })
+
                     })
                     commit('allPosts', response.data)
                 })
@@ -351,7 +386,7 @@ export default createStore({
         updatePost: async ({commit}, payloadUpdatePost) => {
             console.log("log Payloade dans addPost : ", payloadUpdatePost)
             commit("setStatus", "post_posted")
-           await instancePosts.put('/' + payloadUpdatePost.uuidPost, {
+            await instancePosts.put('/' + payloadUpdatePost.uuidPost, {
                 content: payloadUpdatePost.content,
                 uuid: payloadUpdatePost.uuid
             }, {
@@ -368,7 +403,7 @@ export default createStore({
                 })
         },
 
-        addCommentPost: async ({commit}, payloadAddComment) =>{
+        addCommentPost: async ({commit}, payloadAddComment) => {
             commit("setStatus", "addComment_ok")
             await instancePosts.patch('/create-comment-post', payloadAddComment)
                 .then((response) => {
@@ -377,7 +412,33 @@ export default createStore({
                 .catch((err) => {
                     console.log(err)
                 })
-        }
+        },
+
+        deleteComment: async ({commit}, payloadDeleteComment) => {
+            console.log("log Payloade dans addPost : ", payloadDeleteComment)
+            commit("setStatus", "comment_delete")
+            await instancePosts.delete('/delete-comment-post/' + payloadDeleteComment.uuid)
+                .then((response) => {
+                    console.log("Comment delete :", response)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        },
+
+        updateComment: async ({commit}, payloadUpdateComment) => {
+            console.log("log Payloade dans addPost : ", payloadUpdateComment)
+            commit("setStatus", "post_posted")
+            await instancePosts.put('/edit-comment-post/' + payloadUpdateComment.uuidComment, {
+                content: payloadUpdateComment.content,
+            })
+                .then((response) => {
+                    console.log("Post update :", response)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        },
 
     },
     modules: {}

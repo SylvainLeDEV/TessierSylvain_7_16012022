@@ -19,7 +19,8 @@ module.exports = (sequelize, DataType) => {
             });
             this.belongsTo(models.User, {
                 foreignKey: "userId",
-                // onDelete: 'CASCADE'
+                // onDelete: 'CASCADE',
+                as: 'userComment'
             })
         }
     }
@@ -61,11 +62,13 @@ module.exports = (sequelize, DataType) => {
         sequelize,
         modelName: 'Comments',
     });
-    Comments.beforeDestroy(async (comments) => {
-        const filename = comments.imageUrl.split('/images/comment')[1];
-        fs.unlink(`images/comment/${filename}`, (res) => {
-            console.log(res)
+    if (Comments.filename) {
+        Comments.beforeDestroy(async (comments) => {
+            const filename = comments.imageUrl.split('/images/comment')[1];
+            fs.unlink(`images/comment/${filename}`, (res) => {
+
+            })
         })
-    })
+    }
     return Comments;
 };
