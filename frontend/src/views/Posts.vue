@@ -63,8 +63,8 @@
         <header class="post__header">
           <img class="post__header-img" :src="post.User.picture" alt="Image profile">
           <div class="post__header-text">
-            <router-link @click="getUserProfile(post)" :to="{ name: 'Profile', params:{uuid : post.User.uuid}}">
-              <div class="post__header-pseudo"> {{ post.User.firstName }}</div>
+            <router-link class="post__header-pseudo" @click="getUserProfile(post)" :to="{ name: 'Profile', params:{uuid : post.User.uuid}}">
+              <div> {{ post.User.firstName }}</div>
             </router-link>
             <div class="post__header-date"> {{ post.createdAt }}</div>
           </div>
@@ -432,10 +432,17 @@ export default {
   border: solid 1px #DBDBDB;
   border-radius: 5px;
   background: #FFF;
-
+  box-shadow: 5px 5px 10px 2px rgba(0,0,0,0.5);
   &__header {
     padding: 5px;
     display: flex;
+
+
+
+    &-pseudo{
+      outline: none;
+
+    }
 
     &-img {
       width: 50px;
@@ -488,16 +495,18 @@ export default {
 
 .comment {
 
-
-  margin: 5px;
+  //margin: 5px;
 
   &__add {
-    border: solid 1px #DBDBDB;
-    border-radius: 5px;
+    border-top: solid 2px rgba(140, 140, 140, 0.51);
+    border-bottom: solid 2px rgba(140, 140, 140, 0.51);
+    box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.05);
+    //border-radius: 5px;
     display: flex;
     padding: 10px;
     justify-content: space-around;
     align-items: center;
+
 
     &-text {
       background: #fff;
@@ -516,12 +525,14 @@ export default {
 
   &__containerComent {
     border: solid 1px #DBDBDB;
-    border-radius: 5px;
+    border-radius: 30px 5px 5px 5px ;
     display: flex;
     padding: 10px;
     flex-direction: column;
     align-items: center;
     margin: 10px 10px 10px 15px;
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.1);
+
 
     &-img {
       width: 45px;
