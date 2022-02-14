@@ -56,8 +56,8 @@
     </v-card>
     <!---->
 
-    <!--    container posts and comment-->
-    <main class="main" :key="componentKey">
+    <!----------------------    container posts --------------->
+    <main class="main" v-if="renderComponent">
       <div class="post" v-for="post in allPosts" :key="post.id">
 
         <header class="post__header">
@@ -128,7 +128,9 @@
           >
             <v-icon>mdi-delete outline</v-icon>
           </v-btn>
+          <!-- ---------------------------END POST -------------------------- -->
 
+          <!------------------------------ COMMENT ----------------------------->
 
         </div>
 
@@ -225,12 +227,13 @@ export default {
       image: null,
       imageUrl: "",
       updatePostTextArea: [],
-      updateCommentTextArea:[],
+      updateCommentTextArea: [],
       postUpdate: [],
       commentPost: [],
       componentKey: 0,
-      commentUpdate:[],
-      uuidUser: '',
+      commentUpdate: [],
+      renderComponent: true,
+
 
     }
   },
@@ -238,16 +241,22 @@ export default {
   mounted: function () {
     this.$store.dispatch('getAllPosts')
 
-    const localStorageUser = JSON.parse(localStorage.getItem('user'))
-    const uuidUser = localStorageUser.uuidUser
-    this.uuidUser = uuidUser
 
   },
 
   methods: {
     forceRerender() {
-      this.componentKey++
-      this.$store.dispatch('getAllPosts')
+
+
+      this.renderComponent = false;
+
+      this.$nextTick().then(() => {
+        this.$store.dispatch('getAllPosts')
+        this.renderComponent = true;
+      })
+
+
+      // this.componentKey++
     },
     addPictureOnPosts: function () {
       this.$refs.fileInputPosts.click();
@@ -318,7 +327,6 @@ export default {
 
       this.$store.dispatch('deletePost', payloadDeletePost)
           .then(() => {
-
             this.forceRerender()
           })
 
@@ -350,12 +358,15 @@ export default {
     },
 
     validAddComment: function (post) {
+      const localStorageUser = JSON.parse(localStorage.getItem('user'))
+      const uuidUser = localStorageUser.uuidUser
+
       console.log(this.contentCommentPost)
 
       const payloadAddComment = {
         content: this.contentCommentPost,
         postUuid: post.uuid,
-        posterId: this.uuidUser
+        posterId: uuidUser
       };
 
       this.$store.dispatch('addCommentPost', payloadAddComment)
@@ -367,7 +378,7 @@ export default {
 
     },
 
-    deleteComment: function (comment){
+    deleteComment: function (comment) {
       const payloadDeleteComment = {uuid: comment.uuid}
 
       this.$store.dispatch('deleteComment', payloadDeleteComment)
@@ -377,13 +388,13 @@ export default {
 
     },
 
-    updateComment:function (comment){
+    updateComment: function (comment) {
 
       this.updateCommentTextArea[comment.id] = !this.updateCommentTextArea[comment.id]
 
     },
 
-    validUpdateComment:function (comment){
+    validUpdateComment: function (comment) {
       console.log(this.commentUpdate)
       const payloadUpdateComment = {
 
@@ -530,7 +541,7 @@ export default {
       }
     }
 
-    &-btn{
+    &-btn {
       display: flex;
       width: 100%;
       justify-content: space-between;

@@ -63,6 +63,7 @@
 
 import {mapState} from 'vuex'
 import Loader from "@/components/Loader";
+// import userService from "@/services/userService";
 
 export default {
   name: "login",
@@ -83,6 +84,7 @@ export default {
     if (this.$store.state.user.uuidUser !== "-1") {
       this.$router.push("/posts/")
       return;
+
     }
   },
 
@@ -113,7 +115,19 @@ export default {
       this.mode = "login";
     },
 
-    login: function () {
+    login: async function () {
+
+      // try {
+      //   await userService.login({email: this.email, password: this.password})
+      //       .then((response) => {
+      //         this.$store.dispatch('login', {uuidUser: response.uuidUser, token: response.token})
+      //         this.$router.push('/posts')
+      //       })
+      // } catch (error) {
+      //   this.error = error.toString()
+      // }
+
+
       this.$store.dispatch('login', {
         email: this.email,
         password: this.password
