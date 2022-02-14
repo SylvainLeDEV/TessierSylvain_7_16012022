@@ -238,9 +238,8 @@ export default {
     }
   },
 
-  mounted: function () {
+  created: function () {
     this.$store.dispatch('getAllPosts')
-
 
   },
 
@@ -252,7 +251,9 @@ export default {
 
       this.$nextTick().then(() => {
         this.$store.dispatch('getAllPosts')
+
         this.renderComponent = true;
+
       })
 
 
@@ -382,9 +383,7 @@ export default {
       const payloadDeleteComment = {uuid: comment.uuid}
 
       this.$store.dispatch('deleteComment', payloadDeleteComment)
-          .then(() => {
-            this.forceRerender()
-          })
+      this.forceRerender()
 
     },
 
@@ -414,7 +413,7 @@ export default {
     ...mapState({
       allPosts: 'allPosts',
       postCreatedAt: 'postCreatedAt',
-      userInfos: 'userInfos'
+      userInfos: 'userInfos',
     }),
 
     allPosts() {

@@ -125,7 +125,7 @@ import UpdateInfoUser from "@/components/UpdateInfoUser";
 export default {
   name: "Profile",
   components: {UpdateInfoUser},
-  beforeMount: function () {
+  beforeMount(){
     if (this.$store.state.user.uuidUser == "-1") {
       this.$router.push("/")
       return;

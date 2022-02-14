@@ -1,5 +1,5 @@
 <template>
-<!--  <Loader/>-->
+  <!--  <Loader/>-->
   <v-app>
     <v-layout style="overflow: hidden">
       <v-app-bar
@@ -13,19 +13,19 @@
       <v-navigation-drawer v-if="$route.path !== '/'"
                            v-model="drawer"
                            absolute
-                           temporary >
-        <v-list nav dense >
+                           temporary>
+        <v-list nav dense>
           <v-list-item-group v-model="group" active-class="deep-purple--text text--accent-4">
             <v-list-item prepend-icon="mdi-home" title="Groupomania" to="/posts"></v-list-item>
 
-            <v-list-item prepend-icon="mdi-account" title="Profile" :to="{name : 'Profile', params:{ uuid : uuid }}"></v-list-item>
+            <v-list-item prepend-icon="mdi-account" title="Profile" @click="userProfile()"></v-list-item>
           </v-list-item-group>
         </v-list>
       </v-navigation-drawer>
       <v-main>
         <v-card
             class="mx-auto overflow-auto"
-            height="100vh" >
+            height="100vh">
 
           <router-view/>
         </v-card>
@@ -41,16 +41,29 @@
 export default {
 
   mounted() {
-    const user = JSON.parse(localStorage.getItem('user'))
-    this.uuid = user.uuidUser
+
   },
   name: 'App',
   // components: {Loader},
   data: () => ({
     drawer: false,
     group: null,
-    uuid : ''
+    uuid: ''
   }),
+  methods:{
+
+    userProfile: function (){
+      if (localStorage.getItem('user')) {
+        const user = JSON.parse(localStorage.getItem('user'))
+        this.uuid = user.uuidUser
+      // :to="{name : 'Profile', params:{ uuid : uuid }}"
+        this.$router.push({ name: 'Profile', params:{ uuid : this.uuid }})
+      }
+
+
+    }
+
+  }
 }
 </script>
 
@@ -84,11 +97,11 @@ export default {
   box-sizing: border-box;
 }
 
-.groupomania{
+.groupomania {
 
 }
 
-#app > div > div > div > header > div > div > img{
+#app > div > div > div > header > div > div > img {
   width: 50%;
   height: 100%;
   object-fit: cover;

@@ -2,15 +2,16 @@ import {createStore} from 'vuex'
 
 const axios = require('axios');
 
+let user = localStorage.getItem('user')
+
 const instance = axios.create({
     baseURL: 'http://localhost:3000/api/user/',
 });
 
 const instancePosts = axios.create({
-    baseURL: 'http://localhost:3000/api/post/'
+    baseURL: 'http://localhost:3000/api/post/',
 })
 
-let user = localStorage.getItem('user')
 if (!user) {
     user = {
         uuidUser: "-1",
@@ -71,6 +72,7 @@ export default createStore({
 
         logUser: function (state, user) {
             instance.defaults.headers.common['Authorization'] = user.token;
+            instancePosts.defaults.headers.common['Authorization'] = user.token;
             localStorage.setItem('user', JSON.stringify(user))
             state.user = user;
         },
@@ -161,7 +163,7 @@ export default createStore({
                             comment.createdAt = `${Math.trunc(timeDiffComment.minutes)}min`
                             break;
 
-                        case timeDiffComment.days <=  1 :
+                        case timeDiffComment.days <= 1 :
                             comment.createdAt = `${Math.trunc(timeDiffComment.hours)}h`
                             break;
 
@@ -174,7 +176,7 @@ export default createStore({
                             break;
 
                         default:
-                        console.log(timeDiffComment);
+                            console.log(timeDiffComment);
                     }
                 })
                 return post.createdAt = dateLocal
@@ -349,37 +351,40 @@ export default createStore({
 
         getAllPosts: async ({commit}) => {
             commit("setStatus", "loading_posts")
-            await instancePosts.get('/')
-                .then((response) => {
-                    const user = localStorage.getItem('user')
-                    const uuidUser = JSON.parse(user)
-                    console.log("getAllPosts in STORE", response)
-                    response.data.forEach((post) => {
-                        if (uuidUser.uuidUser === post.User.uuid) {
-                            post.buttonModify = true
-                            post.buttonDelete = true
-                        } else {
-                            post.buttonModify = false
-                            post.buttonDelete = false
-                        }
-
-                        post.comment.forEach((comment) => {
-                            if (uuidUser.uuidUser === comment.posterId) {
-                                comment.buttonModify = true
-                                comment.buttonDelete = true
+            return await new Promise((resolve, reject) => {
+                 instancePosts.get('/')
+                    .then((response) => {
+                        const user = localStorage.getItem('user')
+                        const uuidUser = JSON.parse(user)
+                        response.data.forEach((post) => {
+                            if (uuidUser.uuidUser === post.User.uuid) {
+                                post.buttonModify = true
+                                post.buttonDelete = true
                             } else {
-                                comment.buttonModify = false
-                                comment.buttonDelete = false
+                                post.buttonModify = false
+                                post.buttonDelete = false
                             }
-                        })
 
+                            post.comment.forEach((comment) => {
+                                if (uuidUser.uuidUser === comment.posterId) {
+                                    comment.buttonModify = true
+                                    comment.buttonDelete = true
+                                } else {
+                                    comment.buttonModify = false
+                                    comment.buttonDelete = false
+                                }
+                            })
+
+                        })
+                        commit('allPosts', response.data)
+                        resolve(response)
                     })
-                    commit('allPosts', response.data)
-                })
-                .catch((err) => {
-                    commit('setStatus', "no_posts")
-                    console.log(err)
-                })
+                    .catch((err) => {
+                        commit('setStatus', "no_posts")
+                        console.log(err)
+                        reject(err)
+                    })
+            })
         },
 
         addPost: async ({commit}, payloadAddPost) => {

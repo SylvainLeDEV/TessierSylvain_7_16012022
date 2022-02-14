@@ -80,7 +80,7 @@ export default {
     }
   },
 
-  mounted: function () {
+  mounted() {
     if (this.$store.state.user.uuidUser !== "-1") {
       this.$router.push("/posts/")
       return;
@@ -117,24 +117,13 @@ export default {
 
     login: async function () {
 
-      // try {
-      //   await userService.login({email: this.email, password: this.password})
-      //       .then((response) => {
-      //         this.$store.dispatch('login', {uuidUser: response.uuidUser, token: response.token})
-      //         this.$router.push('/posts')
-      //       })
-      // } catch (error) {
-      //   this.error = error.toString()
-      // }
-
 
       this.$store.dispatch('login', {
         email: this.email,
         password: this.password
       }).then(() => {
         this.$router.push("/posts")
-      }).catch((error) => {
-        console.log(error)
+      }).catch(() => {
       })
     },
 
@@ -147,7 +136,6 @@ export default {
         password: this.password
       }).then((response) => {
         this.login();
-        this.$router.push("/posts")
         console.log(response)
       }).catch((error) => {
         console.log(error)

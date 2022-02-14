@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "postId",
         onDelete: 'CASCADE',
         as:"comment",
-        hooks: true
+        // hooks: true
       })
 
     }
