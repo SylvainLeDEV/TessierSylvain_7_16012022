@@ -138,22 +138,43 @@ export default createStore({
                 });
 
                 post.comment.forEach((comment) => {
-                    const datePostCreat = new Date(comment.createdAt)
 
+                    let timeDiff = function (date1, date2) {
+                        let a = new Date(date1).getTime(),
+                            b = new Date(date2).getTime(),
+                            diff = {};
+
+                        diff.milliseconds = a > b ? a % b : b % a;
+                        diff.seconds = diff.milliseconds / 1000;
+                        diff.minutes = diff.seconds / 60;
+                        diff.hours = diff.minutes / 60;
+                        diff.days = diff.hours / 24;
+                        diff.weeks = diff.days / 7;
+
+                        return diff;
+                    }
                     const dateNow = new Date()
-                    const diffDate = new Date(dateNow.getTime() - datePostCreat.getTime())
+                    const datePostCreat = new Date(comment.createdAt)
+                    const timeDiffComment = timeDiff(dateNow, datePostCreat)
+                    switch (true) {
+                        case timeDiffComment.minutes <= 59 :
+                            comment.createdAt = `${Math.trunc(timeDiffComment.minutes)}min`
+                            break;
 
-                    comment.createdAt = `${diffDate.getHours()}`
+                        case timeDiffComment.days <=  1 :
+                            comment.createdAt = `${Math.trunc(timeDiffComment.hours)}h`
+                            break;
 
-                    for (let dateDiff of comment.createdAt){
-                        if (dateDiff < 1 ){
-                            comment.createdAt = `${diffDate.getMinutes()}min`
-                        } else if (dateDiff >= 1 ){
-                            comment.createdAt = `${diffDate.getHours()}h`
-                        } else if (dateDiff >= 24) {
-                            comment.createdAt = `${diffDate.getDay()} jour(s)`
-                        }
+                        case timeDiffComment.weeks <= 1 :
+                            comment.createdAt = `${Math.trunc(timeDiffComment.days)} jour(s)`
+                            break;
 
+                        case timeDiffComment.weeks >= 1 :
+                            comment.createdAt = `${Math.trunc(timeDiffComment.weeks)} semaine`
+                            break;
+
+                        default:
+                        console.log(timeDiffComment);
                     }
                 })
                 return post.createdAt = dateLocal
@@ -166,6 +187,7 @@ export default createStore({
             state.allPosts = allPosts
         }
     },
+
     actions: {
         //PROFILE
         createAccount: ({commit}, userInfo) => {
@@ -327,7 +349,7 @@ export default createStore({
 
         getAllPosts: async ({commit}) => {
             commit("setStatus", "loading_posts")
-           await instancePosts.get('/')
+            await instancePosts.get('/')
                 .then((response) => {
                     const user = localStorage.getItem('user')
                     const uuidUser = JSON.parse(user)
