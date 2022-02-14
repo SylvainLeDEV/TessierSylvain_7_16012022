@@ -15,7 +15,7 @@
                            absolute
                            temporary>
         <v-list nav dense>
-          <v-list-item-group v-model="group" active-class="deep-purple--text text--accent-4">
+          <v-list-item-group @click="drawer = !drawer" v-model="group" active-class="deep-purple--text text--accent-4">
             <v-list-item prepend-icon="mdi-home" title="Groupomania" to="/posts"></v-list-item>
 
             <v-list-item prepend-icon="mdi-account" title="Profile" @click="userProfile()"></v-list-item>
@@ -50,16 +50,20 @@ export default {
     group: null,
     uuid: ''
   }),
-  methods:{
+  methods: {
 
-    userProfile: function (){
+    userProfile: async function () {
+
       if (localStorage.getItem('user')) {
         const user = JSON.parse(localStorage.getItem('user'))
         this.uuid = user.uuidUser
-      // :to="{name : 'Profile', params:{ uuid : uuid }}"
-        this.$router.push({ name: 'Profile', params:{ uuid : this.uuid }})
+        // :to="{name : 'Profile', params:{ uuid : uuid }}"
+       await this.$router.push({name: 'Profile', params: {uuid: this.uuid}})
       }
-
+      const uuidUser = location.href.substring(location.href.lastIndexOf('/') + 1)
+      if (uuidUser === this.uuid) {
+       await location.reload()
+      }
 
     }
 
