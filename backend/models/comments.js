@@ -15,11 +15,11 @@ module.exports = (sequelize, DataType) => {
             // define association here
             this.belongsTo(models.Posts, {
                 foreignKey: "postId",
-                // onDelete: 'CASCADE'
+                onDelete: 'CASCADE',
             });
             this.belongsTo(models.User, {
                 foreignKey: "userId",
-                // onDelete: 'CASCADE',
+                onDelete: 'CASCADE',
                 as: 'userComment'
             })
         }
