@@ -36,11 +36,6 @@ export default createStore({
         status: [''],
         user: user,
         userInfos: {},
-        dataUserForInfos: {
-            firstName: "",
-            lastName: "",
-            email: "",
-        },
         pictureProfile: '',
         poste: '',
         bio: '',
@@ -90,9 +85,6 @@ export default createStore({
 
             state.createdAt.temps = dateCreatProfile
             state.createdAt.createdAt = dateLocale
-            state.dataUserForInfos.firstName = userInfos.firstName
-            state.dataUserForInfos.lastName = userInfos.lastName
-            state.dataUserForInfos.email = userInfos.email
             state.bio = userInfos.bio
 
         },
@@ -237,7 +229,6 @@ export default createStore({
                 .then((response) => {
                     commit("userInfos", response.data)
                     commit("updatePictureProfile", response.data.picture)
-                    // console.log(response)
                 })
                 .catch((error) => {
                     commit("setStatus", "error_auth")
@@ -246,17 +237,14 @@ export default createStore({
         },
 
         updateUserInfos: ({commit}, payloadUserInfos) => {
-            console.log(payloadUserInfos)
-            console.log(payloadUserInfos.dataUser)
             instance.put('/' + payloadUserInfos.uuidUser, payloadUserInfos.dataUser, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 }
             })
-                .then((response) => {
+                .then(() => {
                     commit('setStatus', 'userInfosUpdate')
-                    console.log(response)
                 })
                 .catch((err) => {
                     commit("setStatus", 'userInfosUpdate_error')
@@ -274,7 +262,6 @@ export default createStore({
                 .then((response) => {
                     commit("setStatus", "picture_upload")
                     commit("updatePictureProfile", response.data.profileObject.picture)
-                    console.log(response.data.profileObject.picture)
                 })
                 .catch((erro) => {
                     commit("setStatus", "picture_error")
@@ -283,8 +270,7 @@ export default createStore({
         },
 
         updateUserBio: ({commit}, payloadUpdateBio) => {
-            console.log(payloadUpdateBio)
-            console.log(payloadUpdateBio.updateBio)
+
             instance.put('/' + payloadUpdateBio.uuidUser, payloadUpdateBio.updateBio, {
                 headers: {
                     'Accept': 'application/json',
@@ -294,7 +280,6 @@ export default createStore({
                 .then((response) => {
                     commit('setStatus', 'update_bio')
                     commit('updateUserBio', response.data.profileObject.bio)
-                    console.log(response)
                 })
                 .catch(() => {
                     commit("setStatus", 'update_bio_error')
@@ -302,8 +287,6 @@ export default createStore({
         },
 
         updateUserPoste: ({commit}, payloadUpdatePoste) => {
-            console.log(payloadUpdatePoste)
-            console.log(payloadUpdatePoste.updatePoste)
             instance.put('/' + payloadUpdatePoste.uuidUser, payloadUpdatePoste.updatePoste, {
                 headers: {
                     'Accept': 'application/json',
@@ -313,7 +296,6 @@ export default createStore({
                 .then((response) => {
                     commit('setStatus', 'update_poste')
                     commit('updateUserPoste', response.data.profileObject.poste)
-                    console.log(response)
                 })
                 .catch((err) => {
                     commit("setStatus", 'update_poste_error')
@@ -326,9 +308,8 @@ export default createStore({
                 email: payloadDeleteUser.email,
                 password: payloadDeleteUser.password
             })
-                .then(async (response) => {
+                .then(async () => {
                     commit('setStatus', 'user_ok')
-                    console.log(response)
 
                     await instance.delete('/' + payloadDeleteUser.uuidUser)
                         .then((response) => {
@@ -390,8 +371,8 @@ export default createStore({
         addPost: async ({commit}, payloadAddPost) => {
             commit("setStatus", "addpost_ok")
             await instancePosts.post('/createpost', payloadAddPost)
-                .then((response) => {
-                    console.log("response addPost :", response)
+                .then(() => {
+                    console.log('Add post')
                 })
                 .catch((err) => {
                     console.log(err)
@@ -399,11 +380,10 @@ export default createStore({
         },
 
         deletePost: async ({commit}, payloadDeletePost) => {
-            console.log("log Payloade dans addPost : ", payloadDeletePost)
             commit("setStatus", "post_posted")
             await instancePosts.delete('/' + payloadDeletePost.uuid)
-                .then((response) => {
-                    console.log("Post delete :", response)
+                .then(() => {
+                    console.log('Post Delete')
                 })
                 .catch((err) => {
                     console.log(err)
@@ -411,7 +391,6 @@ export default createStore({
         },
 
         updatePost: async ({commit}, payloadUpdatePost) => {
-            console.log("log Payloade dans addPost : ", payloadUpdatePost)
             commit("setStatus", "post_posted")
             await instancePosts.put('/' + payloadUpdatePost.uuidPost, {
                 content: payloadUpdatePost.content,

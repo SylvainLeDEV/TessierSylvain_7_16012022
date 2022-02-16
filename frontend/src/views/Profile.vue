@@ -77,9 +77,8 @@
       </v-textarea>
 
       <div v-else class="profile__bio" >
-        <h3> Ma bio : </h3>
+        <h3 v-if="user.bio !==null"> Ma bio : </h3>
               <p class="profile__bio" >
-
                 {{ user.bio }}
               </p>
       </div>
@@ -100,19 +99,6 @@
       Supprimer le profile (Définitif)
     </button>
 
-    <!--    //Pour les POSTS-->
-    <div class="posts" v-for="post in user.posts" :key="post.id">
-      <div v-if="post == null">
-        <p> L'utilisateur n'as pas fait de posts </p>
-      </div>
-      <div v-else class="posts__posts-name">
-        <p>{{ post.userName }}</p>
-        <div class="posts__content">
-          <p>{{ post.content }}</p>
-        </div>
-      </div>
-    </div>
-
 
   </div>
 
@@ -125,12 +111,11 @@ import UpdateInfoUser from "@/components/UpdateInfoUser";
 export default {
   name: "Profile",
   components: {UpdateInfoUser},
-  beforeMount(){
+  mounted(){
     if (this.$store.state.user.uuidUser == "-1") {
       this.$router.push("/")
       return;
     }
-    // console.log(location.href.substring(location.href.lastIndexOf('/')+1))
 
     const userStorage = JSON.parse(localStorage.getItem('user'))
     const uuidUserStorage = userStorage.uuidUser
@@ -142,10 +127,6 @@ export default {
       console.log(uuidUserStorage, uuidUser, " true ou fals ", uuidUserStorage === uuidUser)
       return this.getUserUuid = false
     }
-
-  },
-  mounted: function () {
-
 
   },
 

@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
         const isAdminToken = decodedToken.isAdmin;
         //nous ajoutons un objet  auth  à l'objet de requête qui contient le  userId  extrait du token
         req.auth = {uuidUserToken: uuidUserToken};
-        req.admin = {isAdminToken: isAdminToken};
+        req.isAdmin = {isAdminToken: isAdminToken};
         if (req.body.uuid && req.body.uuid !== uuidUserToken) {
             return res.status(401).json({message: "invalid ID user"})
         } else {

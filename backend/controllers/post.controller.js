@@ -93,18 +93,31 @@ module.exports.updatePost = (req, res, next) => {
     // METTRE EN PLACE le isAdmin
     const uuidPost = req.params.uuid
     const {content, videoUrl} = req.body
-    Posts.findOne({where: {uuid: uuidPost}})
+    Posts.findOne({where: {uuid: uuidPost},include: [
+            {
+                model: User,
+                as: 'User'
+            },
+            {
+                model: Comments,
+                as: 'comment',
+                include: [{
+                    model: User,
+                    as: 'userComment'
+                }]
+            }
+        ]})
         .then((post) => {
 
             if (!post) {
                 return res.status(401).json({message: "Pas de post trovué ! "})
             }
 
-            // if (post.User.uuid !== req.auth.uuidUserToken) {
-            //     return res.status(400).json({
-            //         message: 'Unauthorized request',
-            //     })
-            // }
+            if (post.User.uuid !== req.auth.uuidUserToken) {
+                return res.status(400).json({
+                    message: 'Unauthorized request',
+                })
+            }
 
             if (req.files && req.files.post) {
                 const filename = post.imageUrl.split('/images/posts')[1];
@@ -169,6 +182,12 @@ module.exports.deletePost = (req, res, next) => {
             if (!post) {
                 return res.status(401).json({message: "Pas de post trovué ! "})
             }
+
+            if (req.isAdmin.isAdminToken) {
+                post.destroy()
+                return res.status(200).json({message: 'Post destroy by Admin'})
+            }
+            console.log("DELETE",post.User.uuid)
             if (post.User.uuid !== req.auth.uuidUserToken) {
                 return res.status(400).json({
                     message: 'Unauthorized request',
@@ -179,74 +198,13 @@ module.exports.deletePost = (req, res, next) => {
             // fs.unlink(`images/posts/${filename}`, () => {
             // })
             post.destroy()
-
             return res.status(200).json({message: 'Post destroy'})
+
         })
         .catch((err) => {
             return res.status(500).json({err: err})
         })
 }
-
-// module.exports.likePost = (req, res, next) => {
-//     if (!ObjectID.isValid(req.params.id))
-//         return res.status(400).send('ID unknow : ' + req.params.id);
-//     try {
-//         postModel.findByIdAndUpdate(
-//             req.params.id,
-//             {$addToSet: {likers: req.body.id}},
-//             {new: true},
-//             (err, docs) => {
-//                 if (err) res.status(400).send(err);
-//             }
-//         );
-//         userModel.findByIdAndUpdate(
-//             req.body.id,
-//             {$addToSet: {likes: req.params.id}},
-//             {new: true},
-//             (err, docs) => {
-//                 if (!err) res.status(200).send(docs);
-//                 else return res.status(400).send(err)
-//             }
-//         );
-//     } catch (err) {
-//         return res.status(400).send({err})
-//     }
-// }
-//
-// module.exports.unlikePost = (req, res, next) => {
-//     if (!ObjectID.isValid(req.params.id))
-//         return res.status(400).send('ID unknow : ' + req.params.id);
-//
-//     try {
-//         postModel.findByIdAndUpdate(
-//             req.params.id,
-//             {$pull: {likers: req.body.id}},
-//             {new: true},
-//             (err, docs) => {
-//                 if (err) res.status(400).send(err);
-//             }
-//         );
-//         userModel.findByIdAndUpdate(
-//             req.body.id,
-//             {$pull: {likes: req.params.id}},
-//             {new: true},
-//             (err, docs) => {
-//                 if (!err) res.status(200).send(docs);
-//                 else return res.status(400).send(err)
-//             }
-//         );
-//     } catch (err) {
-//         return res.status(400).send({err})
-//     }
-//
-//
-// }
-//
-// // router.patch('/comment-post/:id', postControllers.commentPost);
-// // router.patch('/edit-comment-post/:id', postControllers.editCommentPost);
-// // router.patch('/delete-comment-post/:id', postControllers.deleteCommentPost);
-//
-
 
 module.exports.createCommentPost = async (req, res, next) => {
     const {content, videoUrl, postUuid, posterId} = req.body
@@ -323,7 +281,6 @@ module.exports.getCommentPost = (req, res, next) => {
 
 module.exports.editCommentPost = (req, res, next) => {
 
-    // ATTENTION AJOUTER L'AUTH !!!
     // METTRE EN PLACE le isAdmin
 
     const uuidComment = req.params.uuid
@@ -334,11 +291,14 @@ module.exports.editCommentPost = (req, res, next) => {
                 return res.status(401).json({message: "Pas de comentaire trouvé !"})
             }
 
-            // if (comment.User.uuid !== req.auth.uuidUserToken) {
-            //     return res.status(400).json({
-            //         message: 'Unauthorized request',
-            //     })
-            // }
+
+
+                if (comment.posterId !== req.auth.uuidUserToken) {
+                return res.status(400).json({
+                    message: 'Unauthorized request',
+                })
+            }
+
             if (req.files && req.files.comment) {
                 const filename = comment.imageUrl.split('/images/comment')[1];
                 console.log(req.files)
@@ -377,7 +337,6 @@ module.exports.editCommentPost = (req, res, next) => {
 
 module.exports.deleteCommentPost = (req, res, next) => {
 
-    // ATTENTION AJOUTER L'AUTH !!!
     // METTRE EN PLACE le isAdmin
 
     const uuidComment = req.params.uuid
@@ -389,6 +348,18 @@ module.exports.deleteCommentPost = (req, res, next) => {
             if (!comment) {
                 return res.status(401).json({message: "Pas de commentaire trovué ! "})
             }
+
+            if (req.isAdmin.isAdminToken){
+                comment.destroy()
+                return res.status(200).json({message: 'Comment destroy by Admin'})
+            }
+
+            if (comment.posterId !== req.auth.uuidUserToken) {
+                return res.status(400).json({
+                    message: 'Unauthorized request',
+                })
+            }
+            console.log('ici')
 
             // let filename = null
             // if (req.files && req.files.comment) {

@@ -49,6 +49,7 @@ exports.login = (req, res, next) => {
                     }
                     return res.status(200).send({
                         uuidUser: user.uuid,
+                        isAdmin : user.isAdmin,
                         // La méthode  sign()  du package  jsonwebtoken  utilise une clé secrète pour encoder un token qui peut contenir un payload personnalisé et avoir une validité limitée.
                         token: jwt.sign(
                             {
@@ -66,30 +67,6 @@ exports.login = (req, res, next) => {
         .catch(error => res.status(500).json({error: error}))
 
 };
-
-exports.loginForDelete = (req, res, next) => {
-    User.findOne({where: {email: req.body.email}})
-        .then(user => {
-            console.log(user)
-            if (!user) {
-                return res.status(401).json({message: 'Utilisateur non trouvé ! '})
-            }
-
-            bcrypt.compare(req.body.password, user.password)
-                .then(valid => {
-                    console.log(valid)
-                    if (!valid) {
-                        return res.status(401).json({message: 'Mot de passe incorrect! '})
-                    }
-                    return res.status(200).json({message: "User OK et pret pour etre delete"})
-                })
-                .catch(error => res.status(500).json({error: error}))
-
-        })
-        .catch(error => res.status(500).json({error: error}))
-
-};
-
 
 module.exports.logout = (req, res) => {
     res.cookie('jwt', '', {maxAge: 1});

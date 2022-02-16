@@ -42,11 +42,10 @@
                 <v-text-field
                     label="Email"
                     v-model="email"
-                    error-messages="Email non valide"
-                    :rules="[errorFunc]"
+                    :error-messages="errorMessage"
                     required
                 ></v-text-field>
-                
+
 
               </v-col>
             </v-row>
@@ -78,6 +77,7 @@
 <script>
 import {mapState} from "vuex";
 // import validator from 'validator'
+import isEmail from 'validator/lib/isEmail'
 
 export default {
   name: 'UpdateInfoUser',
@@ -87,39 +87,67 @@ export default {
     firstNameUpdate: "",
     lastNameUpdate: "",
     emailUpdate: "",
+    errorMessage: ''
   }),
 
   methods: {
 
     getInfosUser: function () {
+      console.log(this.email)
+      if (this.email !== undefined && isEmail(this.email)) {
 
-      const updateInfosUser = {
-        email: this.email,
-        firstName:this.firstName,
-        lastName:this.lastName,
-        bio: undefined,
-        poste:undefined
+        const updateInfosUser = {
+          email: this.email,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          bio: undefined,
+          poste: undefined
+        }
+
+        const payloadUserInfos = {
+          uuidUser: this.$store.state.user.uuidUser,
+          dataUser: updateInfosUser,
+        }
+
+        console.log(payloadUserInfos)
+
+        this.$store.dispatch('updateUserInfos', payloadUserInfos)
+
+        this.dialog = false
+        location.reload()
+
+      } else if (this.email === undefined) {
+
+        const updateInfosUser = {
+          email: this.email,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          bio: undefined,
+          poste: undefined
+        }
+
+        const payloadUserInfos = {
+          uuidUser: this.$store.state.user.uuidUser,
+          dataUser: updateInfosUser,
+        }
+
+        console.log(payloadUserInfos)
+
+        this.$store.dispatch('updateUserInfos', payloadUserInfos)
+
+        this.dialog = false
+        location.reload()
+      } else {
+        alert('mail valide obligatoire')
+        this.dialog = true
       }
-
-      const payloadUserInfos = {
-        uuidUser: this.$store.state.user.uuidUser,
-        dataUser : updateInfosUser,
-      }
-
-      console.log(payloadUserInfos)
-
-      this.$store.dispatch('updateUserInfos', payloadUserInfos)
-
-      console.log(this.firstName, this.lastName, this.email)
-
-      this.dialog = false
     },
   },
 
   computed: {
     ...mapState({
       user: "userInfos",
-      dataUserForInfos : 'dataUserForInfos',
+      dataUserForInfos: 'dataUserForInfos',
     }),
   }
 
