@@ -30,11 +30,8 @@ npm install
 npm start 
 ```
 
-<<<<<<< refs/remotes/origin/main
 ### Contact
 =======
-###Contact
->>>>>>> README
 Sylvain TESSIER : <dev.tess.sylvain@gmail.com>
 
 
