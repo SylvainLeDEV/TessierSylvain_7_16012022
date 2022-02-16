@@ -28,10 +28,10 @@
           alt="Image de profile valid"
       >
       </v-img>
-      <p v-else> Pour le moment une seule image est accepté </p>
+      <!--      <p v-else> Pour le moment une seule image est accepté </p>-->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn @click="addPictureOnPosts"
+        <v-btn v-if="imageUrl !== ''" @click="addPictureOnPosts"
                text
                icon
                size="small"
@@ -63,7 +63,8 @@
         <header class="post__header">
           <img class="post__header-img" :src="post.User.picture" alt="Image profile">
           <div class="post__header-text">
-            <router-link class="post__header-pseudo" @click="getUserProfile(post)" :to="{ name: 'Profile', params:{uuid : post.User.uuid}}">
+            <router-link class="post__header-pseudo" @click="getUserProfile(post)"
+                         :to="{ name: 'Profile', params:{uuid : post.User.uuid}}">
               <div> {{ post.User.firstName }}</div>
             </router-link>
             <div class="post__header-date"> {{ post.createdAt }}</div>
@@ -72,7 +73,7 @@
 
         <div class="post__body">
           <img class="post__body-img" v-if="post.imageUrl !== null " :src="post.imageUrl" alt="Image du post">
-          <div v-if="updatePostTextArea[post.id]">
+          <div v-if="updatePostTextArea == post.id">
           <textarea v-model="postUpdate" placeholder="Modifies ton post">
           </textarea>
             <v-btn
@@ -105,36 +106,42 @@
             </p>
           </div>
 
-          <v-btn
-              v-if="post.buttonModify"
-              class="post__footer-btn-modify"
-              color="success"
-              icon
-              depressed
-              size="small"
-              @click="updatePost($event ,post)"
-          >
-            <v-icon>mdi-pencil outline</v-icon>
-          </v-btn>
+          <div>
+            <v-btn
+                v-if="post.buttonModify"
+                class="post__footer-btn-modify"
+                color="blue-lighten-4"
+                conten
+                icon
+                depressed
+                size="small"
+                @click="updatePost($event ,post)"
+            >
+              <v-icon
+                  color="blue darken-3
+">mdi-pencil outline
+              </v-icon>
+            </v-btn>
 
-          <v-btn
-              v-if="post.buttonDelete"
-              class="post__footer-btn-delete"
-              color="error"
-              depressed
-              icon
-              size="small"
-              @click="deletePost(post)"
-          >
-            <v-icon>mdi-delete outline</v-icon>
-          </v-btn>
+            <v-btn
+                v-if="post.buttonDelete || user.isAdmin === true"
+                class="post__footer-btn-delete"
+                color="blue-grey-lighten-5"
+                depressed
+                icon
+                size="small"
+                @click="deletePost(post)"
+            >
+              <v-icon>mdi-delete outline</v-icon>
+            </v-btn>
+          </div>
           <!-- ---------------------------END POST -------------------------- -->
 
           <!------------------------------ COMMENT ----------------------------->
 
         </div>
 
-        <div class="comment" v-if="commentPost[post.id]">
+        <div class="comment" v-if="commentPost == post.id">
           <div class="comment__add">
             <textarea class="comment__add-text" v-model="contentCommentPost" placeholder="Votre commentaire...">
           </textarea>
@@ -161,7 +168,7 @@
                 <p class="comment__containerComent-date"> {{ comment.createdAt }}</p>
               </div>
             </div>
-            <div v-if="updateCommentTextArea[comment.id]">
+            <div v-if="updateCommentTextArea == comment.id">
           <textarea v-model="commentUpdate" placeholder="Modifies ton commentaire">
           </textarea>
               <v-btn
@@ -180,19 +187,21 @@
               <v-btn
                   v-if="comment.buttonModify"
                   class="comment__containerComent-btn-modify"
-                  color="success"
+                  color="blue-lighten-4"
                   icon
                   depressed
                   size="x-small"
                   @click="updateComment(comment)"
               >
-                <v-icon>mdi-pencil outline</v-icon>
+                <v-icon
+                    color="blue darken-3">mdi-pencil outline
+                </v-icon>
               </v-btn>
 
               <v-btn
-                  v-if="comment.buttonDelete"
+                  v-if="comment.buttonDelete || user.isAdmin"
                   class="comment__containerComent-btn-delete"
-                  color="error"
+                  color="blue-grey-lighten-5"
                   depressed
                   icon
                   size="x-small"
@@ -226,37 +235,30 @@ export default {
       contentCommentPost: '',
       image: null,
       imageUrl: "",
-      updatePostTextArea: [],
-      updateCommentTextArea: [],
+      updatePostTextArea: null,
+      updateCommentTextArea: null,
       postUpdate: [],
-      commentPost: [],
+      commentPost: null,
       componentKey: 0,
       commentUpdate: [],
       renderComponent: true,
-
-
     }
   },
 
   created: function () {
     this.$store.dispatch('getAllPosts')
-
+    console.log(this.$store.state.dataUserForInfos)
   },
 
   methods: {
     forceRerender() {
 
-
       this.renderComponent = false;
 
       this.$nextTick().then(() => {
         this.$store.dispatch('getAllPosts')
-
         this.renderComponent = true;
-
       })
-
-
       // this.componentKey++
     },
     addPictureOnPosts: function () {
@@ -334,8 +336,7 @@ export default {
     },
 
     updatePost: function (event, post) {
-
-      this.updatePostTextArea[post.id] = !this.updatePostTextArea[post.id]
+      this.updatePostTextArea === post.id ? this.updatePostTextArea = null : this.updatePostTextArea = post.id
 
     },
 
@@ -355,7 +356,7 @@ export default {
     },
 
     addCommentPost: function (post) {
-      this.commentPost[post.id] = !this.commentPost[post.id]
+      this.commentPost === post.id ? this.commentPost = null : this.commentPost = post.id
     },
 
     validAddComment: function (post) {
@@ -363,18 +364,20 @@ export default {
       const uuidUser = localStorageUser.uuidUser
 
       console.log(this.contentCommentPost)
+      if (this.contentPost !== '') {
+        const payloadAddComment = {
+          content: this.contentCommentPost,
+          postUuid: post.uuid,
+          posterId: uuidUser
+        };
 
-      const payloadAddComment = {
-        content: this.contentCommentPost,
-        postUuid: post.uuid,
-        posterId: uuidUser
-      };
-
-      this.$store.dispatch('addCommentPost', payloadAddComment)
-          .then(() => {
-            this.forceRerender()
-          })
-
+        this.$store.dispatch('addCommentPost', payloadAddComment)
+            .then(() => {
+              this.forceRerender()
+            })
+      } else {
+        alert('Ecris ton meilleur commentaire !! ')
+      }
       this.contentCommentPost = ''
 
     },
@@ -383,14 +386,13 @@ export default {
       const payloadDeleteComment = {uuid: comment.uuid}
 
       this.$store.dispatch('deleteComment', payloadDeleteComment)
-      this.forceRerender()
-
+          .then(() => {
+            this.forceRerender()
+          })
     },
 
     updateComment: function (comment) {
-
-      this.updateCommentTextArea[comment.id] = !this.updateCommentTextArea[comment.id]
-
+      this.updateCommentTextArea === comment.id ? this.updateCommentTextArea = null : this.updateCommentTextArea = comment.id
     },
 
     validUpdateComment: function (comment) {
@@ -411,9 +413,9 @@ export default {
   computed: {
 
     ...mapState({
+      user: 'user',
       allPosts: 'allPosts',
       postCreatedAt: 'postCreatedAt',
-      userInfos: 'userInfos',
     }),
 
     allPosts() {
@@ -428,19 +430,21 @@ export default {
 <style scoped lang="scss">
 
 .post {
-  margin-top: 10px;
+  margin-top: 25px;
   border: solid 1px #DBDBDB;
   border-radius: 5px;
   background: #FFF;
-  box-shadow: 5px 5px 10px 2px rgba(0,0,0,0.5);
+  box-shadow: 5px 5px 10px 2px rgba(0, 0, 0, 0.5);
+
   &__header {
     padding: 5px;
     display: flex;
 
 
-
-    &-pseudo{
+    &-pseudo {
       outline: none;
+      color: #2196F3;
+      text-decoration: none;
 
     }
 
@@ -450,6 +454,10 @@ export default {
       object-fit: cover;
       border: 3px solid burlywood;
       border-radius: 50%;
+    }
+
+    &-date {
+      font-size: 14px;
     }
 
     &-text {
@@ -470,9 +478,9 @@ export default {
     }
 
     &-content {
-      margin-left: -5px;
-      margin-right: -5px;
-      margin-bottom: 5px;
+      margin: 10px -5px 5px 65px;
+      min-height: 50px;
+      text-align: left;
     }
   }
 
@@ -481,26 +489,31 @@ export default {
     justify-content: space-between;
     padding: 10px 10px;
 
+    &-btn-modify {
+      margin-right: 5px;
+    }
+
     &-btn-comment {
       position: relative;
     }
 
     &-btn-comment > p {
       position: absolute;
-      top: 25px;
-      left: 25px;
+      font-size: 10px;
+      color: white;
+      top: 10px;
+      left: 17px;
     }
   }
 }
 
 .comment {
 
-  //margin: 5px;
 
   &__add {
     border-top: solid 2px rgba(140, 140, 140, 0.51);
     border-bottom: solid 2px rgba(140, 140, 140, 0.51);
-    box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.05);
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.05);
     //border-radius: 5px;
     display: flex;
     padding: 10px;
@@ -524,15 +537,18 @@ export default {
   }
 
   &__containerComent {
-    border: solid 1px #DBDBDB;
-    border-radius: 30px 5px 5px 5px ;
+    border-radius: 5px 30px 30px 30px;
+    background: #d5d5d5;
     display: flex;
     padding: 10px;
     flex-direction: column;
     align-items: center;
     margin: 10px 10px 10px 15px;
-    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.1);
 
+    &-content {
+      padding-left: 10px;
+      text-align: left;
+    }
 
     &-img {
       width: 45px;
@@ -552,9 +568,13 @@ export default {
     }
 
     &-btn {
-      display: flex;
       width: 100%;
-      justify-content: space-between;
+      display: flex;
+      justify-content: flex-end;
+
+      &-modify {
+        margin-right: 5px;
+      }
     }
 
   }

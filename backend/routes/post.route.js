@@ -7,18 +7,18 @@ const multer = require('../middleware/multer-config');
 
 
 // Routes for post and like
-router.get('/', postControllers.readPost);
-router.get('/:uuid', postControllers.readOnePost);
-router.post('/createpost', multer, postControllers.createPost);
-router.put('/:uuid', multer,postControllers.updatePost);
+router.get('/', auth,postControllers.readPost);
+router.get('/:uuid', auth,postControllers.readOnePost);
+router.post('/createpost', auth, multer, postControllers.createPost);
+router.put('/:uuid', auth, multer,postControllers.updatePost);
 router.delete('/:uuid', auth,postControllers.deletePost);
 
 
 // Routes for comments
-router.get('/comment-post/:uuid', postControllers.getCommentPost);
-router.patch('/create-comment-post/', multer, postControllers.createCommentPost);
-router.put('/edit-comment-post/:uuid', multer, postControllers.editCommentPost);
-router.delete('/delete-comment-post/:uuid', postControllers.deleteCommentPost);
+router.get('/comment-post/:uuid', auth,postControllers.getCommentPost);
+router.patch('/create-comment-post/', auth,multer, postControllers.createCommentPost);
+router.put('/edit-comment-post/:uuid', auth, multer, postControllers.editCommentPost);
+router.delete('/delete-comment-post/:uuid', auth,postControllers.deleteCommentPost);
 
 
 module.exports = router;
