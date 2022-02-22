@@ -14,7 +14,6 @@ module.exports.getAllUsers = (req, res) => {
 
 module.exports.userInfo = (req, res, next) => {
     const uuid = req.params.uuid
-    console.log(uuid)
     User.findOne({
         where: {uuid: uuid},
         include: [{model: Posts, as: "posts", include: ["comment"]}],
@@ -31,14 +30,13 @@ module.exports.userInfo = (req, res, next) => {
 }
 
 module.exports.deleteUser = (req, res, next) => {
-// ATTENTION AJOUTER L'AUTH !!!
+
     const uuidUser = req.params.uuid
     User.findOne({
         where: {uuid: uuidUser},
     })
         .then((user) => {
 
-            console.log("CONTROLE : ", user.uuid, req.auth.uuidUserToken)
             if (user.uuid !== req.auth.uuidUserToken) {
                 return res.status(400).json({
                     message: 'Unauthorized request',
@@ -88,7 +86,7 @@ module.exports.updateUser = async (req, res, next) => {
                         bio,
                         picture: `${req.protocol}://${req.get('host')}/images/profile/${req.files.profile[0].filename}`
                     }
-                    console.log(profileObject)
+
                     user.update(profileObject, {
                         where: req.params.uuid
                     }).then(() => {

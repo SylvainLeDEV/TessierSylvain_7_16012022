@@ -8,9 +8,7 @@ const {User} = require("../models");
 //JWT sont des jetons générés par un serveur lors de l’authentification
 // d’un utilisateur sur une application Web, et qui sont ensuite transmis au client.
 
-
 module.exports.signUp = (req, res) => {
-    console.log(req.body)
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
             User.create({
@@ -35,15 +33,12 @@ module.exports.signUp = (req, res) => {
 exports.login = (req, res, next) => {
     User.findOne({where: {email: req.body.email}})
         .then(user => {
-            console.log(user)
             if (!user) {
                 return res.status(401).json({message: 'Utilisateur non trouvé ! '})
             }
 
             bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
-                    console.log(valid)
-                    console.log(user.uuid)
                     if (!valid) {
                         return res.status(401).json({message: 'Mot de passe incorrect! '})
                     }

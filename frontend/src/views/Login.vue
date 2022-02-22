@@ -1,5 +1,5 @@
 <template>
-
+  <Loader/>
   <div class="card">
     <h1 class="card__title" v-if="mode == 'login' "> Connexion </h1>
 
@@ -45,11 +45,11 @@
 
     <div class="form-row">
       <button @click="login" class="button" :class="{'button--disabled' : !validatedFileds}" v-if="mode == 'login'">
-        <span v-if=" status == 'loading' ">Connexion en cours...</span>
+        <span v-if=" status == 'loading' ">Connexion en cours... </span>
         <span v-else>Connexion</span>
       </button>
       <button @click="createAccount" class="button" :class="{'button--disabled' : !validatedFileds}" v-else>
-        <span v-if=" status == 'loading' ">Création en cours... <Loader/></span>
+        <span v-if=" status == 'loading' ">Création en cours...</span>
         <span v-else>Créer un compte</span>
       </button>
     </div>
@@ -63,7 +63,6 @@
 
 import {mapState} from 'vuex'
 import Loader from "@/components/Loader";
-// import userService from "@/services/userService";
 
 export default {
   name: "login",

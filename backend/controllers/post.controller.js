@@ -71,8 +71,6 @@ module.exports.createPost = async (req, res, next) => {
 }
 
 module.exports.readOnePost = (req, res, next) => {
-    // ATTENTION AJOUTER L'AUTH !!!
-    // METTRE EN PLACE le isAdmin
     const uuidPost = req.params.uuid
 
     Posts.findOne({where: {uuid: uuidPost}, include: [User, Comments]})
@@ -90,7 +88,6 @@ module.exports.readOnePost = (req, res, next) => {
 }
 
 module.exports.updatePost = (req, res, next) => {
-    // METTRE EN PLACE le isAdmin
     const uuidPost = req.params.uuid
     const {content, videoUrl} = req.body
     Posts.findOne({where: {uuid: uuidPost},include: [
@@ -159,8 +156,7 @@ module.exports.updatePost = (req, res, next) => {
 }
 
 module.exports.deletePost = (req, res, next) => {
-    // ATTENTION AJOUTER L'AUTH !!!
-    // METTRE EN PLACE le isAdmin
+
     const uuidPost = req.params.uuid
     Posts.findOne({
         where: {uuid: uuidPost}, include: [
@@ -187,13 +183,13 @@ module.exports.deletePost = (req, res, next) => {
                 post.destroy()
                 return res.status(200).json({message: 'Post destroy by Admin'})
             }
-            console.log("DELETE",post.User.uuid)
+
             if (post.User.uuid !== req.auth.uuidUserToken) {
                 return res.status(400).json({
                     message: 'Unauthorized request',
                 })
             }
-            // console.log("delete image", post.imageUrl)
+            // Ajout de photos mis en stand-by pour le moment
             // const filename = post.imageUrl.split('/images/posts')[1];
             // fs.unlink(`images/posts/${filename}`, () => {
             // })
@@ -264,13 +260,13 @@ module.exports.getCommentPost = (req, res, next) => {
             if (!post) {
                 return res.status(400).json({message: "Pas de post trouvé !"})
             }
-            console.log(post)
+
             Comments.findAll({where: {postId: post.id}, include: [User]})
                 .then((comment) => {
                     const comments = comment.sort(function (a, b) {
                         return b.createdAt - a.createdAt
                     })
-                    console.log("ICI : ", comments)
+
                     return res.status(200).json(["post : ", post, "comment :", [comments]])
                 })
                 .catch((error) => {
@@ -281,8 +277,6 @@ module.exports.getCommentPost = (req, res, next) => {
 
 module.exports.editCommentPost = (req, res, next) => {
 
-    // METTRE EN PLACE le isAdmin
-
     const uuidComment = req.params.uuid
     const {content, videoUrl} = req.body
     Comments.findOne({where: {uuid: uuidComment}})
@@ -290,8 +284,6 @@ module.exports.editCommentPost = (req, res, next) => {
             if (!comment) {
                 return res.status(401).json({message: "Pas de comentaire trouvé !"})
             }
-
-
 
                 if (comment.posterId !== req.auth.uuidUserToken) {
                 return res.status(400).json({
@@ -301,7 +293,7 @@ module.exports.editCommentPost = (req, res, next) => {
 
             if (req.files && req.files.comment) {
                 const filename = comment.imageUrl.split('/images/comment')[1];
-                console.log(req.files)
+
                 fs.unlink(`images/comment/${filename}`, () => {
                     const commentObject = {
                         content,
@@ -337,7 +329,6 @@ module.exports.editCommentPost = (req, res, next) => {
 
 module.exports.deleteCommentPost = (req, res, next) => {
 
-    // METTRE EN PLACE le isAdmin
 
     const uuidComment = req.params.uuid
     Comments.findOne({
@@ -359,8 +350,7 @@ module.exports.deleteCommentPost = (req, res, next) => {
                     message: 'Unauthorized request',
                 })
             }
-            console.log('ici')
-
+// Ajout de photos mis en stand-by pour le moment
             // let filename = null
             // if (req.files && req.files.comment) {
             //     const filename = comment.imageUrl.split('/images/comment/')[1];

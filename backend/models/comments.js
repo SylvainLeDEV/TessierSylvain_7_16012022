@@ -66,7 +66,6 @@ module.exports = (sequelize, DataType) => {
         Comments.beforeDestroy(async (comments) => {
             const filename = comments.imageUrl.split('/images/comment')[1];
             fs.unlink(`images/comment/${filename}`, (res) => {
-
             })
         })
     }

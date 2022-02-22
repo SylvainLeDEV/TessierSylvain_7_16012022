@@ -53,7 +53,7 @@ $anim-delay:calc(1000ms / 12);
 
   &__letter {
     font-family: 'Bilbo Swash Caps', cursive;
-    font-size: 3rem;
+    font-size: 2rem;
     color: black;
     animation: loading 0.5s ease-in-out 3 both;
     animation-direction: alternate-reverse;
@@ -61,7 +61,7 @@ $anim-delay:calc(1000ms / 12);
     @for $i from 1 through $num-letter {
       &--#{$i} {
         animation-delay: $anim-delay*$i;
-        background: -webkit-gradient(linear, left top, left bottom, from(#9356DC), to(#FF79DA));
+        background: -webkit-gradient(linear, left top, left bottom, from(#2196f3), to(#0d6db9));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }

@@ -5,7 +5,6 @@ const userRoutes = require('./routes/user.route');
 const postRoutes = require('./routes/post.route');
 require('dotenv').config({ path: './config/.env',encoding: "latin1" });
 const bodyParser = require("body-parser");
-require('./config/db');
 
 const {User} = require("./models");
 const path = require("path");
@@ -36,6 +35,9 @@ app.use(helmet.frameguard({
 // parse application/json, basically parse incoming Request Object as a JSON Object
 app.use(bodyParser.json());
 // or app.use(express.json());
+
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
 
 app.use(rateLimite({
     windowMs: 24 * 60 * 60 * 1000,

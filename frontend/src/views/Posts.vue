@@ -28,7 +28,7 @@
           alt="Image de profile valid"
       >
       </v-img>
-      <!--      <p v-else> Pour le moment une seule image est accepté </p>-->
+<!--            <p v-else> Pour le moment une seule image est accepté </p>-->
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn v-if="imageUrl !== ''" @click="addPictureOnPosts"
@@ -352,6 +352,7 @@ export default {
           .then(() => {
             this.forceRerender()
           })
+      this.updatePostTextArea = null
       this.updatePostTextArea[post.id] = !this.updatePostTextArea[post.id]
     },
 
@@ -364,7 +365,7 @@ export default {
       const uuidUser = localStorageUser.uuidUser
 
       console.log(this.contentCommentPost)
-      if (this.contentPost !== '') {
+      if (this.contentCommentPost !== '') {
         const payloadAddComment = {
           content: this.contentCommentPost,
           postUuid: post.uuid,
@@ -375,10 +376,10 @@ export default {
             .then(() => {
               this.forceRerender()
             })
+        this.contentCommentPost = ''
       } else {
         alert('Ecris ton meilleur commentaire !! ')
       }
-      this.contentCommentPost = ''
 
     },
 
@@ -396,7 +397,6 @@ export default {
     },
 
     validUpdateComment: function (comment) {
-      console.log(this.commentUpdate)
       const payloadUpdateComment = {
 
         uuidComment: comment.uuid,
@@ -407,6 +407,7 @@ export default {
           .then(() => {
             this.forceRerender()
           })
+      this.updateCommentTextArea = null
       this.updateCommentTextArea[comment.id] = !this.updateCommentTextArea[comment.id]
     },
   },
@@ -546,7 +547,7 @@ export default {
     margin: 10px 10px 10px 15px;
 
     &-content {
-      padding-left: 10px;
+      padding: 10px 5px 0 5px;
       text-align: left;
     }
 
@@ -564,6 +565,7 @@ export default {
 
       & > div {
         padding-left: 10px;
+        text-align: left;
       }
     }
 

@@ -173,11 +173,6 @@ export default createStore({
                 })
                 return post.createdAt = dateLocal
             })
-            // const creatAt = new Date(this.$store.state.createdAt.temps)
-            // const diffDate = new Date(dateNow.getTime() - creatAt.getTime())
-            // return diffDate.getUTCDate()
-
-
             state.allPosts = allPosts
         }
     },

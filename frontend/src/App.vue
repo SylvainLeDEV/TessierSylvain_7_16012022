@@ -1,5 +1,5 @@
 <template>
-  <!--  <Loader/>-->
+<!--    <Loader/>-->
   <v-app>
     <v-layout style="overflow: hidden">
       <v-app-bar

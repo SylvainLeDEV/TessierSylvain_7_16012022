@@ -3,9 +3,7 @@
 const {v4: uuidv4} = require('uuid');
 const validator = require('validator');
 
-const {
-    Model
-} = require('sequelize');
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class User extends Model {
         /**
@@ -30,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
         }
 
         toJSON() {
-            return {...this.get(), id: undefined, userId: undefined};
+            return {...this.get(), id: undefined, userId: undefined, isAdmin: undefined};
         }
     }
 

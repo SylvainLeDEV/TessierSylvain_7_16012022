@@ -59,7 +59,6 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Posts',
   });
   Posts.beforeDestroy(async (Posts) => {
-    console.log('ici')
     if (Posts.imageUrl){
       const filename = Posts.imageUrl.split('/images/posts')[1];
     console.log("filename", filename)
