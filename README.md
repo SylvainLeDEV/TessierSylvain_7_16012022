@@ -20,18 +20,57 @@ Développer avec :
 - [Sequelize ORM](https://sequelize.org/v7/)  
 - [MySQL](https://www.mysql.com/fr/)
 
-## Getting Started
 
-### Dependencies
-For back and front :
+
+##Installation Backend
+
+####Dans le dossier backend créer un dossier images et dans le dossier images créer un dossier profile 
+
+````
+à partir du dossier cloné :
+cd .\backend\
+npm install
+mkdir images
+cd .\images
+mkdir profile
+````
+####Créer un fichier .env dans le dossier config
+```
+# NODE APP ENVIRONMENT VARIABLE
+NODE_ENV=development
+PORT=3000
+TOKEN_KEY="RANDOM_TOKEN_SECRET"
+
+# DATABASE CONNECTION
+DB_HOST= 'Ajouter vos infos' 
+DB_USER= 'Ajouter vos infos'
+DB_NAME= 'Ajouter vos infos'
+DB_PASSWORD= 'Ajouter vos infos'
+```
+
+####Créer une base de donnée avec le nom Groupomania
+````
+CREATE DATABASE groupomania;
+Verifier vos données de connection dans le fichier /backend/config/.env
+````
+####Démarrage backend 
+
+````
+npm start
+````
+
+##Installation Frontend
+
+####Démarrage frontend 
 
 ```
 npm install
-npm start 
+npm run serve
 ```
 
+
 ### Contact
-=======
+
 Sylvain TESSIER : <dev.tess.sylvain@gmail.com>
 
 

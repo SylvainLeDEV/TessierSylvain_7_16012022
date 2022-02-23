@@ -28,7 +28,7 @@
           alt="Image de profile valid"
       >
       </v-img>
-<!--            <p v-else> Pour le moment une seule image est accepté </p>-->
+      <!--            <p v-else> Pour le moment une seule image est accepté </p>-->
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn v-if="imageUrl !== ''" @click="addPictureOnPosts"
@@ -150,7 +150,6 @@
                 color="success"
                 depressed
                 @click="validAddComment(post)"
-
             >
               Publier
             </v-btn>
@@ -168,21 +167,22 @@
                 <p class="comment__containerComent-date"> {{ comment.createdAt }}</p>
               </div>
             </div>
-            <div v-if="updateCommentTextArea == comment.id">
-          <textarea v-model="commentUpdate" placeholder="Modifies ton commentaire">
-          </textarea>
+            <div class="comment__containerComent-textarea" v-if="updateCommentTextArea == comment.id">
+          <textarea v-model="commentUpdate" placeholder="Modifies ton commentaire"></textarea>
               <v-btn
+                  class="comment__containerComent-btn-validUpdate"
                   color="success"
                   icon
                   depressed
-                  size="small"
+                  size="x-small"
                   @click="validUpdateComment(comment)"
               >
                 <v-icon>mdi-check or done</v-icon>
               </v-btn>
             </div>
-            <p v-else class="comment__containerComent-content"> {{ comment.content }} </p>
-
+            <div v-else class="comment__containerComent-content">
+              <p > {{ comment.content }} </p>
+            </div>
             <div class="comment__containerComent-btn">
               <v-btn
                   v-if="comment.buttonModify"
@@ -528,6 +528,7 @@ export default {
       box-shadow: inset 0 1px 1px 0 rgb(0 0 0 / 7%);
       margin-left: 0;
       padding: 8px;
+
     }
 
     &-btn {
@@ -547,8 +548,10 @@ export default {
     margin: 10px 10px 10px 15px;
 
     &-content {
-      padding: 10px 5px 0 5px;
+      padding: 10px 0 0 55px;
+      overflow-wrap: anywhere;
       text-align: left;
+      width: 100%;
     }
 
     &-img {
@@ -566,6 +569,14 @@ export default {
       & > div {
         padding-left: 10px;
         text-align: left;
+      }
+    }
+    &-textarea{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      & > textarea{
+        width: 100%;
       }
     }
 

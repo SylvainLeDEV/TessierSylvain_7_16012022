@@ -37,14 +37,13 @@
 <script>
 
 
-// import Loader from "@/components/Loader";
+
 export default {
 
   mounted() {
 
   },
   name: 'App',
-  // components: {Loader},
   data: () => ({
     drawer: false,
     group: null,
@@ -57,7 +56,7 @@ export default {
       if (localStorage.getItem('user')) {
         const user = JSON.parse(localStorage.getItem('user'))
         this.uuid = user.uuidUser
-        // :to="{name : 'Profile', params:{ uuid : uuid }}"
+
        await this.$router.push({name: 'Profile', params: {uuid: this.uuid}})
       }
       const uuidUser = location.href.substring(location.href.lastIndexOf('/') + 1)
@@ -115,9 +114,7 @@ export default {
 
 #app {
   max-width: 100%;
-  //align-items: center;
-  //justify-content: center;
-  //padding: 32px;
+
 }
 
 body {

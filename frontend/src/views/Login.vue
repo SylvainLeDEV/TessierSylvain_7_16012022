@@ -170,7 +170,6 @@ export default {
     &__::placeholder {
       color: #aaaaaa;
     }
-
   }
 
   &__select {
