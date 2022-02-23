@@ -21,7 +21,7 @@ Développer avec :
 - [MySQL](https://www.mysql.com/fr/)
 
 
-#Installation Groupomania 
+# Installation Groupomania 
 
 Cloner le projet :
 ````
