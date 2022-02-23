@@ -22,9 +22,9 @@ Développer avec :
 
 
 
-##Installation Backend
+## Installation Backend
 
-####Dans le dossier backend créer un dossier images et dans le dossier images créer un dossier profile 
+#### Dans le dossier backend créer un dossier images et dans le dossier images créer un dossier profile 
 
 ````
 à partir du dossier cloné :
@@ -34,7 +34,7 @@ mkdir images
 cd .\images
 mkdir profile
 ````
-####Créer un fichier .env dans le dossier config
+#### Créer un fichier .env dans le dossier config
 ```
 # NODE APP ENVIRONMENT VARIABLE
 NODE_ENV=development
@@ -48,20 +48,20 @@ DB_NAME= 'Ajouter vos infos'
 DB_PASSWORD= 'Ajouter vos infos'
 ```
 
-####Créer une base de donnée avec le nom Groupomania
+#### Créer une base de donnée avec le nom Groupomania
 ````
 CREATE DATABASE groupomania;
 Verifier vos données de connection dans le fichier /backend/config/.env
 ````
-####Démarrage backend 
+#### Démarrage backend 
 
 ````
 npm start
 ````
 
-##Installation Frontend
+## Installation Frontend
 
-####Démarrage frontend 
+#### Démarrage frontend 
 
 ```
 npm install
