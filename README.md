@@ -21,6 +21,12 @@ Développer avec :
 - [MySQL](https://www.mysql.com/fr/)
 
 
+#Installation Groupomania 
+
+Cloner le projet :
+````
+git clone https://github.com/SylvainLeDEV/TessierSylvain_7_16012022.git
+````
 
 ## Installation Backend
 
@@ -28,10 +34,10 @@ Développer avec :
 
 ````
 à partir du dossier cloné :
-cd .\backend\
+cd backend
 npm install
 mkdir images
-cd .\images
+cd images
 mkdir profile
 ````
 #### Créer un fichier .env dans le dossier config
@@ -50,7 +56,7 @@ DB_PASSWORD= 'Ajouter vos infos'
 
 #### Créer une base de donnée avec le nom Groupomania
 ````
-CREATE DATABASE groupomania;
+CREATE DATABASE Groupomania;
 Verifier vos données de connection dans le fichier /backend/config/.env
 ````
 #### Démarrage backend 
@@ -64,6 +70,9 @@ npm start
 #### Démarrage frontend 
 
 ```
+à partir du dossier cloné :
+cd frontend
+
 npm install
 npm run serve
 ```
