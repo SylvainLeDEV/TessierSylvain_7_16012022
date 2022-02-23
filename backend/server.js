@@ -50,7 +50,7 @@ server.on('listening', async () => {
     const bind = typeof address === 'string' ? 'pipe ' + address : + port;
     console.log('Listening on http://localhost:' + bind+"/");
 
-    // await sequelize.sync().then(() => console.log('Sync with DATABASE')).catch((err) => console.log("Failed with Sync DATABASE", err));
+    await sequelize.sync().then(() => console.log('Sync with DATABASE')).catch((err) => console.log("Failed with Sync DATABASE", err));
     await sequelize.authenticate().then(() => console.log('Connection DB OK')).catch((err) => console.log("Failed to connect to DB : ", err));
 });
 
