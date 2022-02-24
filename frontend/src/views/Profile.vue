@@ -112,7 +112,7 @@ export default {
   name: "Profile",
   components: {UpdateInfoUser},
   mounted(){
-    if (this.$store.state.user.uuidUser == "-1") {
+    if (this.$store.state.user.uuidUser === "-1") {
       this.$router.push("/")
       return;
     }
@@ -124,7 +124,6 @@ export default {
     this.$store.dispatch('getUserInfos', uuidUser)
 
     if (uuidUserStorage !== uuidUser) {
-      console.log(uuidUserStorage, uuidUser, " true ou fals ", uuidUserStorage === uuidUser)
       return this.getUserUuid = false
     }
 
@@ -246,12 +245,8 @@ export default {
         email: this.$store.state.userInfos.email,
         password: valeurPassword,
       }
-      console.log(payloadDeleteUser)
-
       this.$store.dispatch('deleteUser', payloadDeleteUser)
           .then(() => {
-            console.log(this.$store.state.deleteUserStatus)
-            console.log(this.$store.state.status)
             if (this.$store.state.status === "error_password") {
               alert('Mon de passe incorrect')
             } else if (this.$store.state.deleteUserStatus === true) {

@@ -19,5 +19,4 @@ router.delete("/:uuid", auth,userController.deleteUser);
 //Upload
 // router.post("/upload", multer, uploadController.uploadProfil);
 
-
 module.exports = router;

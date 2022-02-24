@@ -40,6 +40,7 @@
     </div>
 
     <div class="form-row__invalid" v-if=" mode == 'create' && status == 'error_create'">
+      Remplir tous les champs <br>ou<br>
       Adresse mail déjà utilisée
     </div>
 
@@ -81,9 +82,8 @@ export default {
 
   mounted() {
     if (this.$store.state.user.uuidUser !== "-1") {
-      this.$router.push("/posts/")
+      this.$router.push("/posts")
       return;
-
     }
   },
 
@@ -96,7 +96,6 @@ export default {
           return false;
         }
       } else {
-        console.log(this.email)
         if (this.email != "" && this.password != "") {
           return true;
         } else {
@@ -115,8 +114,6 @@ export default {
     },
 
     login: async function () {
-
-
       this.$store.dispatch('login', {
         email: this.email,
         password: this.password

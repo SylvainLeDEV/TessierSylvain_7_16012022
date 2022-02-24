@@ -246,6 +246,12 @@ export default {
   },
 
   created: function () {
+    if (this.$store.state.user.uuidUser === "-1") {
+      console.log(this.$store.state.user.uuidUser)
+      this.$router.push("/")
+      return;
+    }
+
     this.$store.dispatch('getAllPosts')
     console.log(this.$store.state.dataUserForInfos)
   },

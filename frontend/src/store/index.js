@@ -1,9 +1,6 @@
 import {createStore} from 'vuex'
 
 const axios = require('axios');
-
-let user = localStorage.getItem('user')
-
 const instance = axios.create({
     baseURL: 'http://localhost:3000/api/user/',
 });
@@ -12,11 +9,13 @@ const instancePosts = axios.create({
     baseURL: 'http://localhost:3000/api/post/',
 })
 
+let user = localStorage.getItem('user')
+
 if (!user) {
     user = {
         uuidUser: "-1",
         token: "",
-    }
+    };
 } else {
     try {
         user = JSON.parse(user)
