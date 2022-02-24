@@ -50,7 +50,7 @@ TOKEN_KEY="RANDOM_TOKEN_SECRET"
 # DATABASE CONNECTION
 DB_HOST= 'Ajouter vos infos' 
 DB_USER= 'Ajouter vos infos'
-DB_NAME= 'Ajouter vos infos'
+DB_NAME=Groupomania
 DB_PASSWORD= 'Ajouter vos infos'
 ```
 
