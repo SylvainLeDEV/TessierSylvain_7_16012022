@@ -8,7 +8,7 @@
       >
         <v-app-bar-nav-icon v-if="$route.path !== '/'" @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-        <v-img class="groupomania" src="@/assets/Groupomania_logos/icon-left-font-monochrome-white.png"/>
+        <v-img alt="Logo groupomania" src="@/assets/Groupomania_logos/icon-left-font-monochrome-white.png" />
       </v-app-bar>
       <v-navigation-drawer v-if="$route.path !== '/'"
                            v-model="drawer"
@@ -16,9 +16,9 @@
                            temporary>
         <v-list nav dense>
           <v-list-item-group @click="drawer = !drawer" v-model="group" active-class="deep-purple--text text--accent-4">
-            <v-list-item prepend-icon="mdi-home" title="Groupomania" to="/posts"></v-list-item>
+            <v-list-item alt="test" prepend-icon="mdi-home" title="Groupomania" to="/posts"></v-list-item>
 
-            <v-list-item prepend-icon="mdi-account" title="Profile" @click="userProfile()"></v-list-item>
+            <v-list-item alt="test" prepend-icon="mdi-account" title="Profil" @click="userProfile()"></v-list-item>
           </v-list-item-group>
         </v-list>
       </v-navigation-drawer>
@@ -76,7 +76,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #082043;
 }
 
 #nav {
@@ -84,7 +84,7 @@ export default {
 
   a {
     font-weight: bold;
-    color: #2c3e50;
+    color: #082043;
 
     &.router-link-exact-active {
       color: #42b983;
@@ -98,10 +98,6 @@ export default {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-.groupomania {
-
 }
 
 #app > div > div > div > header > div > div > img {
@@ -148,7 +144,7 @@ body {
 }
 
 .button {
-  background: #2196F3;
+  background: #082043;
   color: white;
   border-radius: 8px;
   font-weight: 800;
@@ -160,7 +156,7 @@ body {
 }
 
 .card__action {
-  color: #2196F3;
+  color: #082043;
   text-decoration: underline;
 }
 
@@ -170,7 +166,7 @@ body {
 
 .button:hover {
   cursor: pointer;
-  background: #1976D2;
+  background: #082043;
 }
 
 .button--disabled {

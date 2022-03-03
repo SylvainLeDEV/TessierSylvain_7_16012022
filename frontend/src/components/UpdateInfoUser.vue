@@ -38,6 +38,7 @@
                 ></v-text-field>
               </v-col>
 
+
               <v-col cols="12">
                 <v-text-field
                     label="Email"
@@ -46,7 +47,18 @@
                     required
                 ></v-text-field>
 
-
+              </v-col>
+              <v-col
+                  cols="12"
+                  sm="6"
+                  md="4"
+              >
+                <v-text-field
+                    label="Password"
+                    type="password"
+                    v-model="password"
+                    hint="example of helper text only on focus"
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -87,13 +99,15 @@ export default {
     firstNameUpdate: "",
     lastNameUpdate: "",
     emailUpdate: "",
-    errorMessage: ''
+    errorMessage: '',
+    password: '',
   }),
 
   methods: {
 
     getInfosUser: function () {
       console.log(this.email)
+      console.log(this.password)
       if (this.email !== undefined && isEmail(this.email)) {
 
         const updateInfosUser = {
@@ -115,13 +129,13 @@ export default {
 
         this.dialog = false
         location.reload()
-
-      } else if (this.email === undefined) {
+      } else if (!this.email) {
 
         const updateInfosUser = {
           email: this.email,
           firstName: this.firstName,
           lastName: this.lastName,
+          password: this.password,
           bio: undefined,
           poste: undefined
         }
@@ -137,10 +151,40 @@ export default {
 
         this.dialog = false
         location.reload()
+
       } else {
-        alert('mail valide obligatoire')
+        alert('Email valide obligatoire ')
         this.dialog = true
       }
+
+      if (this.password) {
+        if (this.password > 4) {
+          const updateInfosUser = {
+            email: this.email,
+            firstName: this.firstName,
+            lastName: this.lastName,
+            password: this.password,
+            bio: undefined,
+            poste: undefined
+          }
+
+          const payloadUserInfos = {
+            uuidUser: this.$store.state.user.uuidUser,
+            dataUser: updateInfosUser,
+          }
+
+          console.log(payloadUserInfos)
+
+          this.$store.dispatch('updateUserInfos', payloadUserInfos)
+
+          this.dialog = false
+          location.reload()
+        } else {
+          alert('mdp de plus de 4 character')
+          this.dialog = true
+        }
+      }
+
     },
   },
 

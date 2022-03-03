@@ -11,12 +11,15 @@
     <p class="card__subtitle" v-else> Tu as déjà un compte ? <span class="card__action" @click="switchToLogin"> Se connecter </span>
     </p>
     <div class="form-row">
-      <input v-model="email" type="email" class="form-row__input" placeholder="Adresse mail">
+      <label class="labelInput" for="label"> label </label>
+      <input id="label" v-model="email" type="email" class="form-row__input" placeholder="Adresse mail">
     </div>
 
     <div class="form-row" v-if="mode == 'create'">
-      <input v-model="firstName" type="text" class="form-row__input" placeholder="Prénom">
-      <input v-model="lastName" type="text" class="form-row__input" placeholder="Nom">
+      <label class="labelInput" for="label1"> label </label>
+      <input id="label1" v-model="firstName" type="text" class="form-row__input" placeholder="Prénom">
+      <label class="labelInput" for="label2"> label</label>
+      <input id="label2" v-model="lastName" type="text" class="form-row__input" placeholder="Nom">
     </div>
 
     <div class="form-row" v-if="mode == 'create'">
@@ -32,7 +35,8 @@
     </div>
 
     <div class="form-row">
-      <input v-model="password" type="password" class="form-row__input" placeholder="Mot de passe">
+      <label class="labelInput" for="label3"> label </label>
+      <input id="label3" v-model="password" type="password" class="form-row__input" placeholder="Mot de passe">
     </div>
 
     <div class="form-row__invalid" v-if=" mode == 'login' && status == 'error_login'">
@@ -130,7 +134,8 @@ export default {
         lastName: this.lastName,
         poste: this.poste,
         password: this.password
-      }).then((response) => {
+      })
+          .then((response) => {
         this.login();
         console.log(response)
       }).catch((error) => {
@@ -145,6 +150,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.labelInput{
+  display: none;
+}
 
 .form-row {
   display: flex;

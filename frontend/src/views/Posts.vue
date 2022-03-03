@@ -31,24 +31,26 @@
       <!--            <p v-else> Pour le moment une seule image est accepté </p>-->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn v-if="imageUrl !== ''" @click="addPictureOnPosts"
-               text
-               icon
-               size="small"
-               color="#3A3B3C">
-          <v-icon>mdi-camera-flip-outline</v-icon>
-        </v-btn>
-        <input type="file"
-               style="display: none"
-               ref="fileInputPosts"
-               accept="image/png, image/jpeg, image/jpg, image/gif"
-               size="5242880"
-               @change="filePicturePosts">
+<!--        <v-btn v-if="imageUrl !== ''" @click="addPictureOnPosts"-->
+<!--               text-->
+<!--               icon-->
+<!--               size="small"-->
+<!--               color="#3A3B3C">-->
+<!--          <v-icon>mdi-camera-flip-outline</v-icon>-->
+<!--        </v-btn>-->
+<!--        <input type="file"-->
+<!--               style="display: none"-->
+<!--               ref="fileInputPosts"-->
+<!--               accept="image/png, image/jpeg, image/jpg, image/gif"-->
+<!--               size="5242880"-->
+<!--               @change="filePicturePosts">-->
         <v-btn
+            class="btn-post"
             color="success"
             depressed
             :key="renderComponent"
             @click="addPost"
+
         >
           Post
         </v-btn>
@@ -94,7 +96,7 @@
 
           <div class="post__footer-btn-comment">
             <v-btn
-                text
+                class="test"
                 icon
                 size="small"
                 color="none"
@@ -194,7 +196,7 @@
                   @click="updateComment(comment)"
               >
                 <v-icon
-                    color="blue darken-3">mdi-pencil outline
+                    color="indigo darken-5">mdi-pencil outline
                 </v-icon>
               </v-btn>
 
@@ -247,13 +249,12 @@ export default {
 
   created: function () {
     if (this.$store.state.user.uuidUser === "-1") {
-      console.log(this.$store.state.user.uuidUser)
       this.$router.push("/")
       return;
     }
 
     this.$store.dispatch('getAllPosts')
-    console.log(this.$store.state.dataUserForInfos)
+
   },
 
   methods: {
@@ -436,6 +437,10 @@ export default {
 
 <style scoped lang="scss">
 
+.btn-post{
+  background: green;
+}
+
 .post {
   margin-top: 25px;
   border: solid 1px #DBDBDB;
@@ -450,7 +455,7 @@ export default {
 
     &-pseudo {
       outline: none;
-      color: #2196F3;
+      color: #082043;
       text-decoration: none;
 
     }
@@ -506,10 +511,10 @@ export default {
 
     &-btn-comment > p {
       position: absolute;
-      font-size: 10px;
-      color: white;
-      top: 10px;
-      left: 17px;
+      font-size: 15px;
+      color: black;
+      top: 24px;
+      left: 22px;
     }
   }
 }
@@ -538,7 +543,7 @@ export default {
     }
 
     &-btn {
-      background-color: #4080ff;
+      background-color: #082043;
       padding: 5px;
 
     }

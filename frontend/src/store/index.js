@@ -177,6 +177,7 @@ export default createStore({
     },
 
     actions: {
+        //Nos actions peuvent etre async
         //PROFILE
         createAccount: ({commit}, userInfo) => {
             commit("setStatus", "loading")

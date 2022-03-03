@@ -18,18 +18,25 @@
           color="#1A8917"
           icon="mdi-check-outline"
           size="small"
+          alt="test"
+          for="test"
       ></v-btn>
 
       <v-btn class="card__picture-btn ma-2"
              v-if="getUserUuid"
              @click="updatePictureProfile"
              text
+             alt="test"
              icon
              size="small"
-             color="#3A3B3C">
+             color="#3A3B3C"
+             for="test">
         <v-icon>mdi-camera-flip-outline</v-icon>
       </v-btn>
+      <label for="test" class="label-btn-camera" >ici</label>
       <input type="file"
+             id="test"
+             alt="test"
              style="display: none"
              ref="fileInputPirctureProfile"
              accept="image/png, image/jpeg, image/jpg, image/gif"
@@ -46,7 +53,8 @@
       <p class="profile__temps"> ça fait <span> {{ tempsParmiNous }} jours </span> que tu es parmi nous en tant que :
       </p>
       <div>
-        <select v-if="getUserUuid" v-model="poste" name="poste" id="poste" @change="updatePoste" ref="poste" class="profile__poste">
+        <select v-if="getUserUuid" v-model="poste" name="poste" id="poste" @change="updatePoste" ref="poste"
+                class="profile__poste">
           <option value="">{{ user.poste }}</option>
           <option value="Directeur général">Directeur général</option>
           <option value="Digital Brand Manager">Digital Brand Manager</option>
@@ -76,11 +84,11 @@
         </template>
       </v-textarea>
 
-      <div v-else class="profile__bio" >
+      <div v-else class="profile__bio">
         <h3 v-if="user.bio !==null"> Ma bio : </h3>
-              <p class="profile__bio" >
-                {{ user.bio }}
-              </p>
+        <p class="profile__bio">
+          {{ user.bio }}
+        </p>
       </div>
 
     </div>
@@ -96,7 +104,7 @@
     </div>
 
     <button @click="deleteProfile" class="button button__deleteUser" v-if="getUserUuid">
-      Supprimer le profile (Définitif)
+      Supprimer le profil (Définitif)
     </button>
 
 
@@ -111,7 +119,7 @@ import UpdateInfoUser from "@/components/UpdateInfoUser";
 export default {
   name: "Profile",
   components: {UpdateInfoUser},
-  mounted(){
+  mounted() {
     if (this.$store.state.user.uuidUser === "-1") {
       this.$router.push("/")
       return;
@@ -248,11 +256,11 @@ export default {
       this.$store.dispatch('deleteUser', payloadDeleteUser)
           .then(() => {
             if (this.$store.state.status === "error_password") {
-              alert('Mon de passe incorrect')
+              alert('Mot de passe incorrect')
             } else if (this.$store.state.deleteUserStatus === true) {
               this.$store.commit('deleteUserStatus')
               this.$router.push("/")
-              alert("Profile supprimer")
+              alert("Profil supprimer")
             } else {
               alert('Utilisateur non trouvé')
             }
@@ -277,6 +285,7 @@ export default {
         return this.$store.state.bio
       }
     },
+
     ...mapState({
       user: "userInfos",
       //temps passé depuis la création du profile en jour !
@@ -297,7 +306,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
+.label-btn-camera{
+  display: none;
+}
 .card {
 
   &__picture-container {
@@ -361,13 +372,14 @@ export default {
       min-width: 100px;
       color: black;
     }
-    &__bio{
+
+    &__bio {
 
     }
   }
 
   .button__deleteUser {
-    background: #CF6679;
+    background: #d92932;
   }
 }
 

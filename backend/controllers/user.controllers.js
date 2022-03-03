@@ -1,5 +1,6 @@
 const {User, Posts, Comments} = require("../models");
 const fs = require("fs");
+const bcrypt = require('bcrypt');
 
 
 module.exports.getAllUsers = (req, res) => {
@@ -59,7 +60,11 @@ module.exports.deleteUser = (req, res, next) => {
 module.exports.updateUser = async (req, res, next) => {
     const uuidUser = req.params.uuid
     const {firstName, lastName, email, poste, bio} = req.body
-
+    let password;
+    if (req.body.password){
+    password = bcrypt.hashSync(req.body.password, 10);
+    }
+    console.log(password)
     User.findOne({where: {uuid: uuidUser}})
         .then((user) => {
 
@@ -98,7 +103,7 @@ module.exports.updateUser = async (req, res, next) => {
                 })
             } else {
                 const profileObject = {
-                    firstName, lastName, email, poste, bio
+                    firstName, lastName, email, poste, bio,password
                 }
                 user.update(profileObject, {
                     where: req.params.uuid
